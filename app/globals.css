@@ -24,3 +24,41 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Custom dark dropdown styling */
+[data-theme="dark"] .method-dropdown,
+.dark .method-dropdown {
+  @apply bg-black border-gray-800 text-white;
+}
+
+/* Method indicator dots */
+.method-indicator {
+  @apply w-2 h-2 rounded-full inline-block mr-2;
+}
+
+.method-indicator-get { @apply bg-blue-600; }
+.method-indicator-post { @apply bg-green-600; }
+.method-indicator-put { @apply bg-yellow-600; }
+.method-indicator-delete { @apply bg-red-600; }
+.method-indicator-patch { @apply bg-purple-600; }
+.method-indicator-head { @apply bg-gray-600; }
+.method-indicator-options { @apply bg-teal-600; }
+
+/* Dropdown button hover effect */
+.method-dropdown-button {
+  @apply bg-black text-white hover:bg-gray-800 border-gray-700 transition-colors cursor-pointer;
+}
+
+/* Ensure all interactive elements have pointer cursor */
+button, 
+[role="button"],
+select,
+summary,
+.clickable {
+  cursor: pointer;
+}
+
+/* Ensure dropdown items have pointer cursor */
+[data-radix-dropdown-item] {
+  cursor: pointer;
+}
