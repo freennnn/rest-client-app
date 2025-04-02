@@ -1,0 +1,29 @@
+.header {
+    height: 4rem;
+    position: sticky;
+    top: 0;
+    color: var(--foreground);
+    background: var(--background);
+    border-bottom: 1px solid var(--foreground);
+
+    display: flex;
+    align-items: center;
+    cursor: default;
+    gap: 1rem;
+}
+
+#logo {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#logo img {
+    filter: invert(1);
+}
+
+.action {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
