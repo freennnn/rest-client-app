@@ -29,6 +29,7 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
+  // TODO: remove commented code before release
   // Potential workaround for supabase.auth.getUser() being too slow for every request
   // const { data: { session } } = await supabase.auth.getSession();
   // if (session) {
@@ -45,7 +46,8 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/auth')
   ) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/login', request.nextUrl));
   }
+
   return supabaseResponse;
 }

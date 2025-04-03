@@ -21,9 +21,9 @@ export async function createClient() {
               cookieStore.set(name, value, options);
             });
           } catch (error) {
-            console.error(error);
             // 'setAll' was called from a Server Component instead of Server Action
-            // according to supabase docs we refresh user session in middleware
+            // hence no cookies access.
+            // according to supabase docs we refresh user session in middleware (on a server), we do it on a client too
           }
         },
       },
