@@ -26,14 +26,14 @@ export default function Home() {
       const startTime = performance.now();
       
       const headers: Record<string, string> = {};
-      if (method === 'POST') {
+      if (method === 'POST' || method === 'PUT') {
         headers['Content-Type'] = contentType;
       }
 
       const options: RequestInit = {
         method,
         headers,
-        body: method === 'POST' ? requestBody : undefined,
+        body: (method === 'POST' || method === 'PUT') ? requestBody : undefined,
       };
 
       const response = await fetch(url, options);
@@ -91,6 +91,8 @@ export default function Home() {
           >
             <option value="GET">GET</option>
             <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
           </select>
           
           <input
@@ -111,7 +113,7 @@ export default function Home() {
           </button>
         </div>
         
-        {method === 'POST' && (
+        {(method === 'POST' || method === 'PUT') && (
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
               <div className="flex gap-2 items-center">
