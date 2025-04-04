@@ -1,103 +1,160 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [url, setUrl] = useState('');
+  const [method, setMethod] = useState('GET');
+  const [requestBody, setRequestBody] = useState('');
+  const [prettyPrint, setPrettyPrint] = useState(false);
+  const [responseData, setResponseData] = useState<{
+    status: number;
+    statusText: string;
+    body: string;
+    time?: number;
+  } | null>(null);
+  const [contentType, setContentType] = useState('application/json');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+  };
+
+  const formatRequestBody = () => {
+    if (contentType.includes('json') && requestBody) {
+      try {
+        const parsed = JSON.parse(requestBody);
+        setRequestBody(JSON.stringify(parsed, null, 2));
+        setPrettyPrint(true);
+      } catch (e) {
+        setError('Invalid JSON format');
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen p-4 max-w-5xl mx-auto">
+      <header className="mb-6">
+        <h1 className="text-2xl font-bold mb-2">RESTful Client</h1>
+      </header>
+
+      <form onSubmit={handleSubmit} className="mb-6">
+        <div className="flex flex-col md:flex-row mb-4 gap-2">
+          <select
+            className="border p-2 rounded bg-black text-white"
+            value={method}
+            onChange={(e) => setMethod(e.target.value)}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="PATCH">PATCH</option>
+            <option value="DELETE">DELETE</option>
+            <option value="HEAD">HEAD</option>
+          </select>
+          
+          <input
+            type="url"
+            placeholder="Enter endpoint URL"
+            className="flex-1 border p-2 rounded"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            required
+          />
+          
+          <button 
+            type="submit" 
+            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+            disabled={loading}
           >
-            Read our docs
-          </a>
+            {loading ? 'Sending...' : 'Send'}
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        
+        {(method === 'POST' || method === 'PUT' || method === 'PATCH') && (
+          <div className="mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex gap-2 items-center">
+                <label className="font-medium">Request Body</label>
+                <select
+                  className="border p-1 rounded text-sm bg-black text-white"
+                  value={contentType}
+                  onChange={(e) => setContentType(e.target.value)}
+                >
+                  <option value="application/json">JSON</option>
+                  <option value="text/plain">Plain Text</option>
+                </select>
+              </div>
+              
+              {contentType.includes('json') && (
+                <button 
+                  type="button" 
+                  onClick={formatRequestBody}
+                  className="text-sm bg-gray-200 dark:bg-gray-700 p-1 rounded"
+                >
+                  Prettify
+                </button>
+              )}
+            </div>
+            
+            <textarea
+              className="w-full h-40 border p-2 rounded font-mono text-sm"
+              value={requestBody}
+              onChange={(e) => setRequestBody(e.target.value)}
+              placeholder={contentType.includes('json') ? '{\n  "key": "value"\n}' : 'Enter request body...'}
+            />
+          </div>
+        )}
+      </form>
+
+      <div className="mb-6">
+        <h2 className="text-xl font-bold mb-2">Response</h2>
+        
+        {error && (
+          <div className="bg-red-100 border-red-400 border p-3 rounded mb-4 text-red-700">
+            {error}
+          </div>
+        )}
+        
+        {responseData ? (
+          <div className="border rounded overflow-hidden">
+            <div className="bg-gray-100 dark:bg-gray-800 p-3 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <span 
+                  className={`inline-block w-3 h-3 rounded-full ${
+                    responseData.status < 300 
+                      ? 'bg-green-500' 
+                      : responseData.status < 400 
+                        ? 'bg-blue-500' 
+                        : responseData.status < 500 
+                          ? 'bg-yellow-500' 
+                          : 'bg-red-500'
+                  }`}
+                ></span>
+                <span className="font-medium">
+                  Status: {responseData.status} {responseData.statusText}
+                </span>
+              </div>
+              {responseData.time && (
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  Time: {responseData.time}ms
+                </span>
+              )}
+            </div>
+            
+            <div className="p-0">
+              <pre className="font-mono text-sm overflow-auto p-4 max-h-96">
+                {responseData.body}
+              </pre>
+            </div>
+          </div>
+        ) : (
+          <div className="border border-gray-200 dark:border-gray-700 rounded p-4 text-center text-gray-500">
+            Response will appear here after sending a request
+          </div>
+        )}
+      </div>
     </div>
   );
 }
