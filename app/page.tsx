@@ -6,7 +6,6 @@ export default function Home() {
   const [url, setUrl] = useState('');
   const [method, setMethod] = useState('GET');
   const [requestBody, setRequestBody] = useState('');
-  const [prettyPrint, setPrettyPrint] = useState(false);
   const [responseData, setResponseData] = useState<{
     status: number;
     statusText: string;
@@ -17,8 +16,53 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setResponseData(null);
+
+    try {
+      const startTime = performance.now();
+      
+      const headers: Record<string, string> = {};
+      if (method === 'POST') {
+        headers['Content-Type'] = contentType;
+      }
+
+      const options: RequestInit = {
+        method,
+        headers,
+        body: method === 'POST' ? requestBody : undefined,
+      };
+
+      const response = await fetch(url, options);
+      const endTime = performance.now();
+      
+      let responseBody;
+      const contentTypeHeader = response.headers.get('content-type');
+      
+      try {
+        if (contentTypeHeader && contentTypeHeader.includes('application/json')) {
+          responseBody = JSON.stringify(await response.json(), null, 2);
+        } else {
+          responseBody = await response.text();
+        }
+      } catch (e) {
+        responseBody = await response.text();
+      }
+      
+      setResponseData({
+        status: response.status,
+        statusText: response.statusText,
+        body: responseBody,
+        time: Math.round(endTime - startTime)
+      });
+    } catch (err) {
+      setError(`Request failed: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatRequestBody = () => {
@@ -26,7 +70,6 @@ export default function Home() {
       try {
         const parsed = JSON.parse(requestBody);
         setRequestBody(JSON.stringify(parsed, null, 2));
-        setPrettyPrint(true);
       } catch (e) {
         setError('Invalid JSON format');
       }
@@ -48,10 +91,6 @@ export default function Home() {
           >
             <option value="GET">GET</option>
             <option value="POST">POST</option>
-            <option value="PUT">PUT</option>
-            <option value="PATCH">PATCH</option>
-            <option value="DELETE">DELETE</option>
-            <option value="HEAD">HEAD</option>
           </select>
           
           <input
@@ -72,7 +111,7 @@ export default function Home() {
           </button>
         </div>
         
-        {(method === 'POST' || method === 'PUT' || method === 'PATCH') && (
+        {method === 'POST' && (
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
               <div className="flex gap-2 items-center">
