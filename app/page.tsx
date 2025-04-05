@@ -2,6 +2,12 @@
 
 import { useState } from 'react';
 
+interface Header {
+  id: string;
+  key: string;
+  value: string;
+}
+
 export default function Home() {
   const [url, setUrl] = useState('');
   const [method, setMethod] = useState('GET');
@@ -15,6 +21,22 @@ export default function Home() {
   const [contentType, setContentType] = useState('application/json');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [headers, setHeaders] = useState<Header[]>([]);
+
+  const addHeader = () => {
+    const newId = `header-${Date.now()}`;
+    setHeaders([...headers, { id: newId, key: '', value: '' }]);
+  };
+
+  const updateHeader = (id: string, field: 'key' | 'value', value: string) => {
+    setHeaders(headers.map(header => 
+      header.id === id ? { ...header, [field]: value } : header
+    ));
+  };
+
+  const removeHeader = (id: string) => {
+    setHeaders(headers.filter(header => header.id !== id));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,14 +47,17 @@ export default function Home() {
     try {
       const startTime = performance.now();
       
-      const headers: Record<string, string> = {};
+      const headersObj: Record<string, string> = {};
       if (method === 'POST' || method === 'PUT') {
-        headers['Content-Type'] = contentType;
+        headersObj['Content-Type'] = contentType;
       }
+      headers.forEach(header => {
+        headersObj[header.key] = header.value;
+      });
 
       const options: RequestInit = {
         method,
-        headers,
+        headers: headersObj,
         body: (method === 'POST' || method === 'PUT') ? requestBody : undefined,
       };
 
@@ -113,6 +138,44 @@ export default function Home() {
           </button>
         </div>
         
+        <div className="mb-4">
+          <div className="flex justify-between items-center mb-2">
+            <label className="font-medium">Headers</label>
+            <button 
+              type="button" 
+              onClick={addHeader}
+              className="text-sm bg-gray-200 dark:bg-gray-700 p-1 rounded"
+            >
+              Add Header
+            </button>
+          </div>
+          {headers.map(header => (
+            <div key={header.id} className="flex gap-2 mb-2">
+              <input
+                type="text"
+                placeholder="Key"
+                className="flex-1 border p-2 rounded"
+                value={header.key}
+                onChange={(e) => updateHeader(header.id, 'key', e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Value"
+                className="flex-1 border p-2 rounded"
+                value={header.value}
+                onChange={(e) => updateHeader(header.id, 'value', e.target.value)}
+              />
+              <button 
+                type="button" 
+                onClick={() => removeHeader(header.id)}
+                className="text-sm bg-red-200 dark:bg-red-700 p-1 rounded"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+
         {(method === 'POST' || method === 'PUT') && (
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
