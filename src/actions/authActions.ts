@@ -21,7 +21,7 @@ export async function signIn(formData: FormData) {
     //showToast(error.message);
     redirect(errorPath());
   }
-  // ivalidates Next cache for home page path, forces page re-render, re-fetches data
+  // invalidates Next cache for home page path, forces page re-render, re-fetches data
   // 'layout' parameter invalidates both page and its layout cache, children
   // layouts and pages, refreshes all shared components (here - auth-dependent aka navigation menu)
   revalidatePath(homePath(), 'layout');
@@ -36,7 +36,6 @@ export async function signUp(formData: FormData) {
     password: formData.get('password') as string,
   };
   const { data: responseData, error } = await supabase.auth.signUp(requestData);
-  console.log(`signUp data=${JSON.stringify(responseData)}`);
   console.log(`signUp error=${error}`);
 
   if (error) {
