@@ -1,3 +1,4 @@
+import { isAuthenticatedPath, signInPath } from '@/paths';
 import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -61,15 +62,10 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
   console.log(`middleware check user=${user}`);
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
-    !request.nextUrl.pathname.startsWith('/signup')
-  ) {
-    console.log('redirecting to login in middleware');
+  if (!user && isAuthenticatedPath(request.nextUrl.pathname)) {
+    console.log('redirecting to signIn in middleware');
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
+    url.pathname = signInPath();
     return NextResponse.redirect(url);
   }
   // STEP 5: Return the final response object.

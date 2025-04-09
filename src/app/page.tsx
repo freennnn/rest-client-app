@@ -1,4 +1,7 @@
 import { signOut } from '@/actions/authActions';
+import SignInButton from '@/features/auth/SignInButton';
+import SignUpButton from '@/features/auth/SignUpButton';
+import { signInPath } from '@/paths';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
@@ -7,7 +10,14 @@ export default async function Home() {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
   if (error || !data?.user) {
-    redirect('/login');
+    //redirect(signInPath());
+    return (
+      <div>
+        Hi guest, please sign in to use all the app features
+        <SignInButton />
+        <SignUpButton />
+      </div>
+    );
   }
   return (
     <div className='grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]'>
