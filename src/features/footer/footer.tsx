@@ -1,4 +1,4 @@
-import rsLogo from '@/../public/rs-logo.svg';
+import rsLogo from '@public/rs-logo.svg';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -10,6 +10,7 @@ export const Footer = () => {
           <Link
             href='https://rs.school/courses/reactjs'
             target='_blank'
+            rel='noopener noreferrer'
             className='flex gap-2 align-center text-sm hover:underline hover:text-blue-600 dark:hover:text-blue-400'
           >
             <Image src={rsLogo} alt='rslogo' width={16} height={16} />
@@ -21,6 +22,7 @@ export const Footer = () => {
           <Link
             href={'https://github.com/freennnn'}
             target='_blank'
+            rel='noopener noreferrer'
             className='hover:underline hover:text-blue-600 dark:hover:text-blue-400'
           >
             @freennnn
@@ -28,6 +30,7 @@ export const Footer = () => {
           <Link
             href={'https://github.com/RUBBOSS'}
             target='_blank'
+            rel='noopener noreferrer'
             className='hover:underline hover:text-blue-600 dark:hover:text-blue-400'
           >
             @RUBBOSS
@@ -35,6 +38,7 @@ export const Footer = () => {
           <Link
             href={'https://github.com/magadanov'}
             target='_blank'
+            rel='noopener noreferrer'
             className='hover:underline hover:text-blue-600 dark:hover:text-blue-400'
           >
             @magadanov
