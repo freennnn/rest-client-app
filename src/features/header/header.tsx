@@ -1,49 +1,73 @@
-import CustomSelect from '@/components/select/select';
-import darkMode from '@public/dark-mode.svg';
-import lightMode from '@public/light-mode.svg';
-import logo from '@public/logo.svg';
+'use client';
+
+import { useState } from 'react';
+
+import { usePathname, useRouter } from '@/i18n/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 
 import langLogo from '../../../public/lang.svg';
+import logo from '../../../public/logo.svg';
+import CustomSelect from '../../components/select/select';
 import styles from './header.module.scss';
 
 export const Header = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const locale = useLocale();
+  const t = useTranslations();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLocaleChange = (locale: string) => {
+    setIsLoading(true);
+    router.replace(pathname, { locale });
+  };
+
+  const defaultValue =
+    locale === 'ru' ? { label: 'Рус', value: 'ru' } : { label: 'Eng', value: 'en' };
+
   return (
-    <header className='flex align-center sticky top-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-3 px-6'>
-      <div id={styles.logo}>
-        <Image src={logo} alt='logo' width={32} height={32} priority />
-        <strong>ShadMen</strong>
-      </div>
-      <div className={styles.action}>
-        <div className='w-10 flex justify-center align-center p-2 border-1 bg-white text-black dark:bg-background dark:text-white hover:scale-110 transition-transform duration-200'>
-          <Image src={lightMode} alt='mode' width={16} height={16} priority />
+    <>
+      {isLoading && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-300/5 backdrop-blur-sm'>
+          <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-white'></div>
         </div>
-        <CustomSelect
-          icon={langLogo}
-          options={[
-            {
-              label: 'Eng',
-              value: 'eng',
-            },
-            {
-              label: 'Rus',
-              value: 'rus',
-            },
-          ]}
-        />
-        <button
-          type='button'
-          className='p-2 border-1 bg-white text-black dark:bg-background dark:text-white hover:scale-110 transition-transform duration-200'
-        >
-          Sign In
-        </button>
-        <button
-          type='button'
-          className='p-2 border-1 bg-white text-black dark:bg-background dark:text-white hover:scale-110 transition-transform duration-200'
-        >
-          Sign Up
-        </button>
-      </div>
-    </header>
+      )}
+      <header className='flex align-center sticky top-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-3 px-6'>
+        <div id={styles.logo}>
+          <Image src={logo} alt='logo' width={32} height={32} />
+          <strong>ShadMen</strong>
+        </div>
+        <div className={styles.action}>
+          <CustomSelect
+            icon={langLogo}
+            defaultValue={defaultValue}
+            options={[
+              {
+                label: 'Eng',
+                value: 'en',
+              },
+              {
+                label: 'Рус',
+                value: 'ru',
+              },
+            ]}
+            onChange={handleLocaleChange}
+          />
+          <button
+            type='button'
+            className='p-2 border-1 bg-white text-black dark:bg-background dark:text-white hover:scale-110 transition-transform duration-200'
+          >
+            {t('signIn')}
+          </button>
+          <button
+            type='button'
+            className='p-2 border-1 bg-white text-black dark:bg-background dark:text-white hover:scale-110 transition-transform duration-200'
+          >
+            {t('signUp')}
+          </button>
+        </div>
+      </header>
+    </>
   );
 };

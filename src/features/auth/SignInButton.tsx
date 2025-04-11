@@ -1,7 +1,7 @@
 'use client';
 
+import { useRouter } from '@/i18n/navigation';
 import { signInPath } from '@/paths';
-import { useRouter } from 'next/navigation';
 
 export default function SignInButton() {
   const router = useRouter();

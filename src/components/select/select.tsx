@@ -9,12 +9,14 @@ type Option = { label: string; value: string; icon?: string };
 interface Props {
   icon?: string;
   options: Option[];
+  defaultValue: Option;
   selectIcon?: boolean;
+  onChange: (value: string) => void;
 }
 
-export default function CustomSelect({ icon, options, selectIcon }: Props) {
+export default function CustomSelect({ icon, options, defaultValue, selectIcon, onChange }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState<Option>(options[0]);
+  const [selected, setSelected] = useState<Option>(defaultValue);
 
   return (
     <div className='relative inline-block'>
@@ -38,6 +40,7 @@ export default function CustomSelect({ icon, options, selectIcon }: Props) {
               onClick={() => {
                 setSelected(option);
                 setIsOpen(false);
+                onChange(option.value);
               }}
               className='w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800'
             >

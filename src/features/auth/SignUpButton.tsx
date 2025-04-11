@@ -1,7 +1,7 @@
 'use client';
 
+import { useRouter } from '@/i18n/navigation';
 import { signUpPath } from '@/paths';
-import { useRouter } from 'next/navigation';
 
 export default function SignUpButton() {
   const router = useRouter();

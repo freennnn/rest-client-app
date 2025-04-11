@@ -4,8 +4,16 @@
   gap: 5px;
 }
 
+#logo img {
+  filter: invert(1);
+}
+
 .action {
   display: flex;
   gap: 0.5rem;
   margin-left: auto;
+}
+
+.action img {
+  filter: invert(1);
 }
