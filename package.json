@@ -17,8 +17,6 @@
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.4",
-    "@tailwindcss/oxide-win32-x64-msvc": "^4.0.0-alpha.16",
-    "lightningcss-win32-x64-msvc": "^1.29.3",
     "next": "15.2.4",
     "next-intl": "^4.0.2",
     "react": "^19.0.0",
@@ -40,5 +38,9 @@
     "sass": "^1.86.1",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "optionalDependencies": {
+    "@tailwindcss/oxide-win32-x64-msvc": "^4.0.0-alpha.16",
+    "lightningcss-win32-x64-msvc": "^1.29.3"
   }
 }
