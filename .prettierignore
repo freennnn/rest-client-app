@@ -1,0 +1,17 @@
+# Ignore artifacts:
+build
+coverage
+node_modules
+dist
+
+# Ignore specific configuration files
+*.config.js
+*.config.ts
+
+# Ignore environment variables files
+.env
+.env.*
+
+# Ignore lock files
+package-lock.json
+package.json

@@ -3,13 +3,13 @@ declare module 'postman-collection' {
     constructor(options: {
       url: string;
       method: string;
-      header?: Array<{key: string, value: string}>;
+      header?: Array<{ key: string; value: string }>;
       body?: string | object | null;
     });
   }
 
-  const PostmanCollection = {
-    Request
+  declare const PostmanCollection: {
+    Request: typeof Request;
   };
 
   export default PostmanCollection;

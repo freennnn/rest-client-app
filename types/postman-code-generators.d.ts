@@ -1,7 +1,7 @@
-declare module "postman-code-generators" {
+declare module 'postman-code-generators' {
   export interface ConvertOptions {
     indentCount: number;
-    indentType: "Space" | "Tab";
+    indentType: 'Space' | 'Tab';
     trimRequestBody?: boolean;
     followRedirect?: boolean;
   }
@@ -46,12 +46,4 @@ declare module "postman-code-generators" {
     language: string,
     callback: (error: Error | null, variants: Variant[]) => void
   ): void;
-
-  const postmanCodeGenerators = {
-    convert,
-    getLanguageList,
-    getVariantsList,
-  };
-
-  export default postmanCodeGenerators;
 }

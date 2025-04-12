@@ -34,12 +34,14 @@ export function decodeRequestBody(encodedBody: string): string {
   }
 }
 
-export function parseHeadersFromSearchParams(searchParams: URLSearchParams): Record<string, string> {
+export function parseHeadersFromSearchParams(
+  searchParams: URLSearchParams
+): Record<string, string> {
   const headers: Record<string, string> = {};
-  
+
   searchParams.forEach((value, key) => {
     headers[key] = decodeURIComponent(value);
   });
-  
+
   return headers;
 }

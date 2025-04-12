@@ -1,13 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 import { useSearchParams } from 'next/navigation';
-import { useCodeGenerator } from './hooks/useCodeGenerator';
-import { sendRequest } from './utils/httpClient';
+
 import RequestForm from './components/RequestForm';
 import ResponseDisplay from './components/ResponseDisplay';
+import { useCodeGenerator } from './hooks/useCodeGenerator';
 import { Header, ResponseData } from './types/types';
-import { encodeRequestUrl, decodeRequestUrl, encodeRequestBody, decodeRequestBody } from './utils/urlEncoder';
+import { sendRequest } from './utils/httpClient';
+import {
+  decodeRequestBody,
+  decodeRequestUrl,
+  encodeRequestBody,
+  encodeRequestUrl,
+} from './utils/urlEncoder';
 
 export default function Home() {
   const [url, setUrl] = useState('');
@@ -24,13 +31,13 @@ export default function Home() {
   useEffect(() => {
     const path = window.location.pathname;
     const pathParts = path.split('/').filter(Boolean);
-    
+
     if (pathParts.length >= 1) {
       const urlMethod = pathParts[0];
       if (['GET', 'POST', 'PUT', 'DELETE'].includes(urlMethod)) {
         setMethod(urlMethod);
       }
-      
+
       if (pathParts.length >= 2) {
         try {
           const decodedUrl = decodeRequestUrl(pathParts[1]);
@@ -38,7 +45,7 @@ export default function Home() {
         } catch (err) {
           console.error('Failed to decode URL', err);
         }
-        
+
         if (pathParts.length >= 3 && (urlMethod === 'POST' || urlMethod === 'PUT')) {
           try {
             const decodedBody = decodeRequestBody(pathParts[2]);
@@ -49,66 +56,66 @@ export default function Home() {
         }
       }
     }
-    
+
     const headerEntries: Header[] = [];
     searchParams.forEach((value, key) => {
       headerEntries.push({
         id: `header-${Date.now()}-${key}`,
         key,
-        value: decodeURIComponent(value)
+        value: decodeURIComponent(value),
       });
     });
-    
+
     if (headerEntries.length > 0) {
       setHeaders(headerEntries);
     }
   }, [searchParams]);
 
-  const { 
-    selectedLanguage: selectedCodeLanguage, 
-    setSelectedLanguage: setSelectedCodeLanguage, 
-    generatedCode, 
-    isLoading: codeLoading 
+  const {
+    selectedLanguage: selectedCodeLanguage,
+    setSelectedLanguage: setSelectedCodeLanguage,
+    generatedCode,
+    isLoading: codeLoading,
   } = useCodeGenerator({
     url,
     method,
     headers,
     contentType,
-    body: (method === 'POST' || method === 'PUT') ? requestBody : undefined
+    body: method === 'POST' || method === 'PUT' ? requestBody : undefined,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await sendRequest(url, method, headers, contentType, requestBody);
-      
+
       setResponseData(response);
-      
+
       let urlPath = `/${method}`;
-      
+
       if (url) {
         urlPath += `/${encodeRequestUrl(url)}`;
-        
+
         if ((method === 'POST' || method === 'PUT') && requestBody) {
           urlPath += `/${encodeRequestBody(requestBody)}`;
         }
       }
-      
+
       const queryParams = new URLSearchParams();
-      headers.forEach(header => {
+      headers.forEach((header) => {
         if (header.key.trim() && header.value.trim()) {
           queryParams.append(header.key, encodeURIComponent(header.value));
         }
       });
-      
+
       const queryString = queryParams.toString();
       if (queryString) {
         urlPath += `?${queryString}`;
       }
-      
+
       window.history.replaceState({}, '', urlPath);
     } catch (err) {
       setError(`Request failed: ${err instanceof Error ? err.message : String(err)}`);
@@ -118,12 +125,12 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen p-4 max-w-5xl mx-auto">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">RESTful Client</h1>
+    <div className='min-h-screen p-4 max-w-5xl mx-auto'>
+      <header className='mb-6'>
+        <h1 className='text-2xl font-bold mb-2'>RESTful Client</h1>
       </header>
 
-      <RequestForm 
+      <RequestForm
         url={url}
         setUrl={setUrl}
         method={method}
@@ -143,10 +150,7 @@ export default function Home() {
         error={error}
       />
 
-      <ResponseDisplay 
-        responseData={responseData}
-        error={error}
-      />
+      <ResponseDisplay responseData={responseData} error={error} />
     </div>
   );
 }

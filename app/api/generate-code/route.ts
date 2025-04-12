@@ -1,20 +1,20 @@
-import { NextResponse } from "next/server";
-import sdk from "postman-collection";
-import codegen from "postman-code-generators";
+import { NextResponse } from 'next/server';
+import codegen from 'postman-code-generators';
+import sdk from 'postman-collection';
 
 export async function POST(request: Request) {
   try {
     const { language, request: reqOptions } = await request.json();
 
     const languageMap: Record<string, { language: string; variant: string }> = {
-      curl: { language: "curl", variant: "curl" },
-      fetch: { language: "javascript", variant: "fetch" },
-      xhr: { language: "javascript", variant: "xhr" },
-      nodejs: { language: "nodejs", variant: "axios" },
-      python: { language: "python", variant: "requests" },
-      java: { language: "java", variant: "unirest" },
-      csharp: { language: "csharp", variant: "restsharp" },
-      go: { language: "go", variant: "native" },
+      curl: { language: 'curl', variant: 'curl' },
+      fetch: { language: 'javascript', variant: 'fetch' },
+      xhr: { language: 'javascript', variant: 'xhr' },
+      nodejs: { language: 'nodejs', variant: 'axios' },
+      python: { language: 'python', variant: 'requests' },
+      java: { language: 'java', variant: 'unirest' },
+      csharp: { language: 'csharp', variant: 'restsharp' },
+      go: { language: 'go', variant: 'native' },
     };
 
     const options = languageMap[language] || languageMap.curl;
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
         postmanRequest,
         {
           indentCount: 2,
-          indentType: "Space",
+          indentType: 'Space',
           trimRequestBody: true,
           followRedirect: true,
         },
@@ -64,10 +64,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ code });
   } catch (error) {
-    console.error("Error generating code:", error);
-    return NextResponse.json(
-      { error: "Failed to generate code" },
-      { status: 500 }
-    );
+    console.error('Error generating code:', error);
+    return NextResponse.json({ error: 'Failed to generate code' }, { status: 500 });
   }
 }

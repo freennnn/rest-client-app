@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+
 import { CodeGenOptions } from '../types/types';
 
 export function useCodeGenerator({ url, method, headers, contentType, body }: CodeGenOptions) {
@@ -17,11 +18,11 @@ export function useCodeGenerator({ url, method, headers, contentType, body }: Co
 
       try {
         const headersList = headers
-          .filter(h => h.key.trim() !== '')
-          .map(h => ({ key: h.key, value: h.value }));
-          
+          .filter((h) => h.key.trim() !== '')
+          .map((h) => ({ key: h.key, value: h.value }));
+
         if ((method === 'POST' || method === 'PUT') && contentType) {
-          const contentTypeExists = headers.some(h => h.key.toLowerCase() === 'content-type');
+          const contentTypeExists = headers.some((h) => h.key.toLowerCase() === 'content-type');
           if (!contentTypeExists) {
             headersList.push({ key: 'Content-Type', value: contentType });
           }
@@ -38,12 +39,15 @@ export function useCodeGenerator({ url, method, headers, contentType, body }: Co
               url,
               method,
               header: headersList,
-              body: (method === 'POST' || method === 'PUT') && body ? {
-                mode: contentType?.includes('json') ? 'raw' : 'text',
-                raw: body
-              } : undefined
-            }
-          })
+              body:
+                (method === 'POST' || method === 'PUT') && body
+                  ? {
+                      mode: contentType?.includes('json') ? 'raw' : 'text',
+                      raw: body,
+                    }
+                  : undefined,
+            },
+          }),
         });
 
         if (!response.ok) {
@@ -67,6 +71,6 @@ export function useCodeGenerator({ url, method, headers, contentType, body }: Co
     selectedLanguage,
     setSelectedLanguage,
     generatedCode,
-    isLoading
+    isLoading,
   };
 }
