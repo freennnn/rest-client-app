@@ -1,4 +1,7 @@
 {
+  "MainPage": {
+    "title": "Main Page"
+  },
   "signIn": "Sign In",
   "signUp": "Sign Up"
 }
