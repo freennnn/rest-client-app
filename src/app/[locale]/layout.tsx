@@ -4,7 +4,7 @@ import { Footer } from '@/features/footer/footer';
 import { Header } from '@/features/header/header';
 import { routing } from '@/i18n/routing';
 import type { Metadata } from 'next';
-import { NextIntlClientProvider, hasLocale, useMessages } from 'next-intl';
+import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { notFound } from 'next/navigation';

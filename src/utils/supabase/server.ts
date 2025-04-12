@@ -21,6 +21,7 @@ export async function createClient() {
               cookieStore.set(name, value, options);
             });
           } catch (error) {
+            console.error('Error setting cookies:', error);
             // 'setAll' was called from a Server Component instead of Server Action
             // hence no cookies access.
             // according to supabase docs we refresh user session in middleware (on a server), we do it on a client too

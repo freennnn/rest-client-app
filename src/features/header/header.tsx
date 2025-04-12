@@ -2,19 +2,20 @@
 
 import { useState } from 'react';
 
+import CustomSelect from '@/components/select/select';
 import { usePathname, useRouter } from '@/i18n/navigation';
+import { routing } from '@/i18n/routing';
+import langLogo from '@public/lang.svg';
+import logo from '@public/logo.svg';
 import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 
-import langLogo from '../../../public/lang.svg';
-import logo from '../../../public/logo.svg';
-import CustomSelect from '../../components/select/select';
 import styles from './header.module.scss';
 
 export const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const locale = useLocale();
+  const currentLocale = useLocale();
   const t = useTranslations();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,8 +24,12 @@ export const Header = () => {
     router.replace(pathname, { locale });
   };
 
-  const defaultValue =
-    locale === 'ru' ? { label: 'Рус', value: 'ru' } : { label: 'Eng', value: 'en' };
+  const options = routing.locales.map((locale) => ({
+    label: t(`languages.${locale}`),
+    value: locale,
+  }));
+
+  const defaultValue = options.find((option) => option.value === currentLocale) || options[0];
 
   return (
     <>
@@ -42,16 +47,7 @@ export const Header = () => {
           <CustomSelect
             icon={langLogo}
             defaultValue={defaultValue}
-            options={[
-              {
-                label: 'Eng',
-                value: 'en',
-              },
-              {
-                label: 'Рус',
-                value: 'ru',
-              },
-            ]}
+            options={options}
             onChange={handleLocaleChange}
           />
           <button
