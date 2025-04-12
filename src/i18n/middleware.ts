@@ -29,23 +29,31 @@ export const withIntl: MiddlewareFactory = (next) => {
       return intlResponse;
     }
     // 3. Call next() (this will be supabaseMiddleware in our final chain)
-    const response = await next(request, event);
-    // console.log('[Intl Factory] Received response from next (Supabase).');
+    const responseFromNext = await next(request, event);
+    if (!(responseFromNext instanceof NextResponse)) {
+      // In our case, we're using stackMiddlewares which has a base case that
+      // returns () => NextResponse.next(), so we should always get a NextResponse
+      console.log(
+        'No response from next middleware, fallback to default NextResponse.next() or next-intl response in our case'
+      );
+      return intlResponse;
+    }
+    // console.log('[Intl Factory] Received response from next (Supabase)');
     // 4. Merge necessary headers from intlResponse onto response from next()
     // Most importantly, the rewrite header if intl decided to rewrite
     // (NextResponse.rewrite instead of NextResponse.redirect)
     const rewriteHeader = intlResponse.headers.get('x-middleware-rewrite');
     if (rewriteHeader) {
       //   console.log(`[Intl Factory] Merging rewrite header: ${rewriteHeader}`);
-      response.headers.set('x-middleware-rewrite', rewriteHeader);
+      responseFromNext.headers.set('x-middleware-rewrite', rewriteHeader);
     }
     // Optionally merge locale cookie from intlResponse to Supabase response
     const localeCookie = intlResponse.cookies.get('NEXT_LOCALE');
-    if (localeCookie && !response.cookies.has(localeCookie.name)) {
+    if (localeCookie && !responseFromNext.cookies.has(localeCookie.name)) {
       // console.log(`[Intl Factory] Merging locale cookie: ${localeCookie.name}`);
-      response.cookies.set(localeCookie);
+      responseFromNext.cookies.set(localeCookie);
     }
     // 5. Return the final response received from Supabase, now potentially merged with Intl headers
-    return response;
+    return responseFromNext;
   };
 };
