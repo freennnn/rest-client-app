@@ -1,4 +1,4 @@
-import { Header, ResponseData } from '../types/types';
+import { Header, ResponseData } from '../../types/types';
 
 export async function sendRequest(
   url: string,
@@ -42,6 +42,7 @@ export async function sendRequest(
   };
 
   const response = await fetch(requestUrl, options);
+
   const endTime = performance.now();
 
   let responseBody;

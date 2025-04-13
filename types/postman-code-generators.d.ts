@@ -46,4 +46,8 @@ declare module 'postman-code-generators' {
     language: string,
     callback: (error: Error | null, variants: Variant[]) => void
   ): void;
+
+  export const convert: typeof convert;
+  export const getLanguageList: typeof getLanguageList;
+  export const getVariantsList: typeof getVariantsList;
 }

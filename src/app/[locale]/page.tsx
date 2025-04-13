@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/server';
 import { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
+import Link from 'next/link';
 
 type Props = {
   params: Promise<{ locale: Locale }>;
@@ -48,6 +49,9 @@ export default async function IndexPage({ params }: Props) {
         Hi guest, please sign in to use all the app features
         <SignInButton />
         <SignUpButton />
+        <Link href='/GET' className='text-blue-500 hover:text-blue-700 underline'>
+          Go to REST Client
+        </Link>
       </div>
     );
   }
@@ -59,6 +63,9 @@ export default async function IndexPage({ params }: Props) {
           <button type='submit'>Sign Out</button>
         </form>
       )}
+      <Link href='/GET' className='text-blue-500 hover:text-blue-700 underline'>
+        Go to REST Client
+      </Link>
     </>
   );
 }

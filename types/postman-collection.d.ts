@@ -8,9 +8,5 @@ declare module 'postman-collection' {
     });
   }
 
-  declare const PostmanCollection: {
-    Request: typeof Request;
-  };
-
-  export default PostmanCollection;
+  export { Request as default };
 }
