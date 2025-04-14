@@ -3,5 +3,9 @@
     "title": "Main Page"
   },
   "signIn": "Sign In",
-  "signUp": "Sign Up"
+  "signUp": "Sign Up",
+  "languages": {
+    "en": "English",
+    "ru": "Russian"
+  }
 }

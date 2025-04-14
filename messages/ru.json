@@ -3,5 +3,9 @@
     "title": "Главная страница"
   },
   "signIn": "Войти",
-  "signUp": "Регистрация"
+  "signUp": "Регистрация",
+  "languages": {
+    "en": "English",
+    "ru": "Russian"
+  }
 }
