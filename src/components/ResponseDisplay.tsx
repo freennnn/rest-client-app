@@ -48,7 +48,18 @@ export default function ResponseDisplay({ responseData, error }: ResponseDisplay
           </div>
 
           <div className='p-0'>
-            <pre className='font-mono text-sm overflow-auto p-4 max-h-96'>{responseData.body}</pre>
+            <pre className='font-mono text-sm overflow-auto p-4 max-h-96'>
+              {(() => {
+                try {
+                  // Check if the body is valid JSON
+                  const json = JSON.parse(responseData.body);
+                  return JSON.stringify(json, null, 2);
+                } catch {
+                  // If not JSON, return as is
+                  return responseData.body;
+                }
+              })()}
+            </pre>
           </div>
         </div>
       ) : (
