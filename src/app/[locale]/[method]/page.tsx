@@ -2,23 +2,32 @@
 
 import { useEffect, useState } from 'react';
 
-import { useSearchParams } from 'next/navigation';
-
-import RequestForm from './components/RequestForm';
-import ResponseDisplay from './components/ResponseDisplay';
-import { useCodeGenerator } from './hooks/useCodeGenerator';
-import { Header, ResponseData } from './types/types';
-import { sendRequest } from './utils/httpClient';
+import RequestForm from '@/components/RequestForm';
+import ResponseDisplay from '@/components/ResponseDisplay';
+import { useCodeGenerator } from '@/hooks/useCodeGenerator';
+import { Header, ResponseData } from '@/types/types';
+import { sendRequest } from '@/utils/rest-client/httpClient';
 import {
   decodeRequestBody,
   decodeRequestUrl,
   encodeRequestBody,
   encodeRequestUrl,
-} from './utils/urlEncoder';
+} from '@/utils/rest-client/urlEncoder';
+import { useSearchParams } from 'next/navigation';
 
-export default function Home() {
+type RestClientPageProps = {
+  method?: string;
+  encodedUrl?: string;
+  encodedBody?: string;
+};
+
+export default function RestClientPage({
+  method: initialMethod,
+  encodedUrl,
+  encodedBody,
+}: RestClientPageProps = {}) {
   const [url, setUrl] = useState('');
-  const [method, setMethod] = useState('GET');
+  const [method, setMethod] = useState(initialMethod || 'GET');
   const [requestBody, setRequestBody] = useState('');
   const [responseData, setResponseData] = useState<ResponseData | null>(null);
   const [contentType, setContentType] = useState('application/json');
@@ -29,6 +38,7 @@ export default function Home() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    /*
     const path = window.location.pathname;
     const pathParts = path.split('/').filter(Boolean);
 
@@ -45,15 +55,32 @@ export default function Home() {
         } catch (err) {
           console.error('Failed to decode URL', err);
         }
+      }
+    }
+    if (pathParts.length >= 3 && (urlMethod === 'POST' || urlMethod === 'PUT')) {
+      try {
+        const decodedBody = decodeRequestBody(pathParts[2]);
+        setRequestBody(decodedBody);
+      } catch (err) {
+        console.error('Failed to decode request body', err);
+      }
+    }*/
 
-        if (pathParts.length >= 3 && (urlMethod === 'POST' || urlMethod === 'PUT')) {
-          try {
-            const decodedBody = decodeRequestBody(pathParts[2]);
-            setRequestBody(decodedBody);
-          } catch (err) {
-            console.error('Failed to decode request body', err);
-          }
-        }
+    if (encodedUrl) {
+      try {
+        const decodedUrl = decodeRequestUrl(encodedUrl);
+        setUrl(decodedUrl);
+      } catch (err) {
+        console.error('Failed to decode URL', err);
+      }
+    }
+
+    if (encodedBody && (method === 'POST' || method === 'PUT')) {
+      try {
+        const decodedBody = decodeRequestBody(encodedBody);
+        setRequestBody(decodedBody);
+      } catch (err) {
+        console.error('Failed to decode request body', err);
       }
     }
 
@@ -69,7 +96,7 @@ export default function Home() {
     if (headerEntries.length > 0) {
       setHeaders(headerEntries);
     }
-  }, [searchParams]);
+  }, [encodedUrl, encodedBody, method, searchParams]);
 
   const {
     selectedLanguage: selectedCodeLanguage,

@@ -15,9 +15,13 @@
     "lint-staged": "lint-staged"
   },
   "dependencies": {
+
+    "next": "15.2.4",
+    "postman-code-generators": "^1.14.2",
+    "postman-collection": "^4.5.0",
+
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.4",
-    "next": "15.2.4",
     "next-intl": "^4.0.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
@@ -27,6 +31,7 @@
     "@tailwindcss/postcss": "^4",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/node": "^20",
+    "@types/postman-collection": "^3.5.10",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

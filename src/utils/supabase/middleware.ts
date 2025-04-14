@@ -12,7 +12,9 @@ export const withSupabase: MiddlewareFactory = (next) => {
     const responseFromNext = await next(request, event);
     if (!(responseFromNext instanceof NextResponse)) {
       // If the base handler fails, we probably can't do much, return a basic response.
-      console.error('[Supabase Middleware] Base handler failed: Response is not an instance of NextResponse');
+      console.error(
+        '[Supabase Middleware] Base handler failed: Response is not an instance of NextResponse'
+      );
       return new NextResponse('Internal Server Error', { status: 500 });
     }
     const supabaseResponse = responseFromNext; // Start with the response from `next()`
