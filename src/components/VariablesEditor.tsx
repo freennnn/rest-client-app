@@ -2,34 +2,35 @@
 
 import { useEffect, useState } from 'react';
 
-interface Variable {
-  id: string;
-  name: string;
-  value: string;
-}
+import { loadVariables, saveVariables } from '@/utils/variables/variableStorage';
+import { Variable } from '@/utils/variables/variableSubstitution';
 
 export default function VariablesEditor() {
   const [variables, setVariables] = useState<Variable[]>([]);
   const [newVarName, setNewVarName] = useState('');
   const [newVarValue, setNewVarValue] = useState('');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   useEffect(() => {
-    try {
-      const savedVariables = localStorage.getItem('restClientVariables');
-      if (savedVariables) {
-        setVariables(JSON.parse(savedVariables));
-      }
-    } catch (error) {
-      console.error('Failed to parse variables from localStorage:', error);
-    }
+    const storedVariables = loadVariables();
+    setVariables(storedVariables);
   }, []);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('restClientVariables', JSON.stringify(variables));
-    } catch (error) {
-      console.error('Failed to save variables to localStorage:', error);
-    }
+    setSaveStatus('saving');
+    const timeoutId = setTimeout(() => {
+      const success = saveVariables(variables);
+      if (success) {
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 1500);
+      } else {
+        setSaveStatus('error');
+      }
+    }, 500);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [variables]);
 
   const addVariable = () => {
@@ -44,19 +45,79 @@ export default function VariablesEditor() {
     setVariables([...variables, newVariable]);
     setNewVarName('');
     setNewVarValue('');
+    setSaveStatus('saving');
   };
 
   const deleteVariable = (id: string) => {
     setVariables(variables.filter((v) => v.id !== id));
+    setSaveStatus('saving');
   };
 
   const updateVariable = (id: string, value: string) => {
     setVariables(variables.map((v) => (v.id === id ? { ...v, value } : v)));
+    setSaveStatus('saving');
   };
 
   return (
     <div className='space-y-6'>
-      {/* Variable list */}
+      {/* Save status indicator */}
+      {saveStatus !== 'idle' && (
+        <div
+          className={`p-2 rounded flex items-center ${
+            saveStatus === 'saving'
+              ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
+              : saveStatus === 'saved'
+                ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'
+          }`}
+        >
+          {saveStatus === 'saving' && (
+            <>
+              <div className='animate-spin h-4 w-4 border-2 border-yellow-600 dark:border-yellow-400 rounded-full border-t-transparent mr-2'></div>
+              Saving changes...
+            </>
+          )}
+          {saveStatus === 'saved' && (
+            <>
+              <svg
+                className='w-4 h-4 mr-2'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  d='M5 13l4 4L19 7'
+                ></path>
+              </svg>
+              Changes saved successfully
+            </>
+          )}
+          {saveStatus === 'error' && (
+            <>
+              <svg
+                className='w-4 h-4 mr-2'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                ></path>
+              </svg>
+              Error saving changes
+            </>
+          )}
+        </div>
+      )}
+
       <div className='bg-white dark:bg-gray-800 p-4 rounded-lg shadow'>
         <h2 className='text-xl font-semibold mb-4'>Your Variables</h2>
 

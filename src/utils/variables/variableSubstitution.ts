@@ -1,3 +1,5 @@
+import { loadVariables } from './variableStorage';
+
 export interface Variable {
   id: string;
   name: string;
@@ -5,15 +7,7 @@ export interface Variable {
 }
 
 export function getVariables(): Variable[] {
-  try {
-    const savedVariables = localStorage.getItem('restClientVariables');
-    if (savedVariables) {
-      return JSON.parse(savedVariables);
-    }
-  } catch (error) {
-    console.error('Failed to load variables from localStorage:', error);
-  }
-  return [];
+  return loadVariables();
 }
 
 export function hasVariables(text: string): boolean {

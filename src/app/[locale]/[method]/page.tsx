@@ -62,15 +62,17 @@ export default function RestClientPage({
         setUrl(decodedUrl);
       } catch (err) {
         console.error('Failed to decode URL', err);
+        setUrl(encodedUrl);
       }
     }
 
-    if (encodedBody && (method === 'POST' || method === 'PUT')) {
+    if (encodedBody && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
       try {
         const decodedBody = decodeRequestBody(encodedBody);
         setRequestBody(decodedBody);
       } catch (err) {
         console.error('Failed to decode request body', err);
+        setRequestBody('');
       }
     }
 
