@@ -34,13 +34,37 @@ export function decodeRequestBody(encodedBody: string): string {
   }
 }
 
+export function encodeHeaderKeyValue(value: string): string {
+  try {
+    return btoa(encodeURIComponent(value));
+  } catch (error) {
+    console.error('Error encoding header value:', error);
+    throw new Error('Failed to encode header value');
+  }
+}
+
+export function decodeHeaderKeyValue(encodedValue: string): string {
+  try {
+    return decodeURIComponent(atob(encodedValue));
+  } catch (error) {
+    console.error('Error decoding header value:', error);
+    throw new Error('Failed to decode header value');
+  }
+}
+
 export function parseHeadersFromSearchParams(
   searchParams: URLSearchParams
 ): Record<string, string> {
   const headers: Record<string, string> = {};
 
   searchParams.forEach((value, key) => {
-    headers[key] = decodeURIComponent(value);
+    try {
+      const decodedKey = decodeHeaderKeyValue(key);
+      const decodedValue = decodeHeaderKeyValue(value);
+      headers[decodedKey] = decodedValue;
+    } catch (error) {
+      console.error('Error decoding header:', error);
+    }
   });
 
   return headers;

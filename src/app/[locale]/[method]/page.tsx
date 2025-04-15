@@ -8,8 +8,10 @@ import { useCodeGenerator } from '@/hooks/useCodeGenerator';
 import { Header, ResponseData } from '@/types/types';
 import { sendRequest } from '@/utils/rest-client/httpClient';
 import {
+  decodeHeaderKeyValue,
   decodeRequestBody,
   decodeRequestUrl,
+  encodeHeaderKeyValue,
   encodeRequestBody,
   encodeRequestUrl,
 } from '@/utils/rest-client/urlEncoder';
@@ -85,12 +87,20 @@ export default function RestClientPage({
     }
 
     const headerEntries: Header[] = [];
-    searchParams.forEach((value, key) => {
-      headerEntries.push({
-        id: `header-${Date.now()}-${key}`,
-        key,
-        value: decodeURIComponent(value),
-      });
+    searchParams.forEach((encodedValue, encodedKey) => {
+      try {
+        // Decode both key and value from base64
+        const key = decodeHeaderKeyValue(encodedKey);
+        const value = decodeHeaderKeyValue(encodedValue);
+
+        headerEntries.push({
+          id: `header-${Date.now()}-${key}`,
+          key,
+          value,
+        });
+      } catch (err) {
+        console.error('Failed to decode header', err);
+      }
     });
 
     if (headerEntries.length > 0) {
@@ -134,7 +144,9 @@ export default function RestClientPage({
       const queryParams = new URLSearchParams();
       headers.forEach((header) => {
         if (header.key.trim() && header.value.trim()) {
-          queryParams.append(header.key, encodeURIComponent(header.value));
+          const encodedKey = encodeHeaderKeyValue(header.key);
+          const encodedValue = encodeHeaderKeyValue(header.value);
+          queryParams.append(encodedKey, encodedValue);
         }
       });
 

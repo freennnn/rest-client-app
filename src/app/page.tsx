@@ -4,17 +4,19 @@ import { useEffect, useState } from 'react';
 
 import { useSearchParams } from 'next/navigation';
 
-import RequestForm from './components/RequestForm';
-import ResponseDisplay from './components/ResponseDisplay';
-import { useCodeGenerator } from './hooks/useCodeGenerator';
-import { Header, ResponseData } from './types/types';
-import { sendRequest } from './utils/httpClient';
+import RequestForm from '../components/RequestForm';
+import ResponseDisplay from '../components/ResponseDisplay';
+import { useCodeGenerator } from '../hooks/useCodeGenerator';
+import { Header, ResponseData } from '../types/types';
+import { sendRequest } from '../utils/rest-client/httpClient';
 import {
+  decodeHeaderKeyValue,
   decodeRequestBody,
   decodeRequestUrl,
+  encodeHeaderKeyValue,
   encodeRequestBody,
   encodeRequestUrl,
-} from './utils/urlEncoder';
+} from '../utils/rest-client/urlEncoder';
 
 export default function Home() {
   const [url, setUrl] = useState('');
@@ -58,12 +60,19 @@ export default function Home() {
     }
 
     const headerEntries: Header[] = [];
-    searchParams.forEach((value, key) => {
-      headerEntries.push({
-        id: `header-${Date.now()}-${key}`,
-        key,
-        value: decodeURIComponent(value),
-      });
+    searchParams.forEach((encodedValue, encodedKey) => {
+      try {
+        const key = decodeHeaderKeyValue(encodedKey);
+        const value = decodeHeaderKeyValue(encodedValue);
+
+        headerEntries.push({
+          id: `header-${Date.now()}-${key}`,
+          key,
+          value,
+        });
+      } catch (err) {
+        console.error('Failed to decode header', err);
+      }
     });
 
     if (headerEntries.length > 0) {
@@ -107,7 +116,9 @@ export default function Home() {
       const queryParams = new URLSearchParams();
       headers.forEach((header) => {
         if (header.key.trim() && header.value.trim()) {
-          queryParams.append(header.key, encodeURIComponent(header.value));
+          const encodedKey = encodeHeaderKeyValue(header.key);
+          const encodedValue = encodeHeaderKeyValue(header.value);
+          queryParams.append(encodedKey, encodedValue);
         }
       });
 
