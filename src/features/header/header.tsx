@@ -9,6 +9,7 @@ import langLogo from '@public/lang.svg';
 import logo from '@public/logo.svg';
 import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import styles from './header.module.scss';
 
@@ -39,10 +40,12 @@ export const Header = () => {
         </div>
       )}
       <header className='flex align-center sticky top-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-3 px-6'>
-        <div id={styles.logo}>
-          <Image src={logo} alt='logo' width={32} height={32} />
-          <strong>ShadMen</strong>
-        </div>
+        <Link href='/' className='flex items-center cursor-pointer'>
+          <div id={styles.logo}>
+            <Image src={logo} alt='logo' width={32} height={32} />
+            <strong>ShadMen</strong>
+          </div>
+        </Link>
         <div className={styles.action}>
           <CustomSelect
             icon={langLogo}

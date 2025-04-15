@@ -2,27 +2,50 @@
 
 import { Suspense, lazy, useEffect, useState } from 'react';
 
+import { createClient } from '@/utils/supabase/client';
+
 const VariablesEditor = lazy(() => import('@/components/VariablesEditor'));
 
 export default function VariablesPage() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const loadVariables = () => {
+    const checkAuthAndLoadVariables = async () => {
       try {
-        const savedVariables = localStorage.getItem('restClientVariables');
-        if (savedVariables) {
-          console.log('Loaded variables from local storage');
+        const supabase = createClient();
+        const { data } = await supabase.auth.getSession();
+        const isSignedIn = !!data.session;
+        setIsAuthenticated(isSignedIn);
+
+        if (isSignedIn) {
+          try {
+            const savedVariables = localStorage.getItem('restClientVariables');
+            if (savedVariables) {
+              console.log('Loaded variables from local storage after authentication');
+            }
+          } catch (error) {
+            console.error('Failed to load variables from localStorage:', error);
+          }
         }
+
+        setIsLoading(false);
       } catch (error) {
-        console.error('Failed to load variables from localStorage:', error);
-      } finally {
+        console.error('Error checking authentication:', error);
         setIsLoading(false);
       }
     };
 
-    loadVariables();
+    checkAuthAndLoadVariables();
   }, []);
+
+  if (!isLoading && !isAuthenticated) {
+    return (
+      <div className='min-h-screen p-4 flex justify-center items-center'>
+        <p>Please sign in to access variables.</p>
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen p-4 max-w-5xl mx-auto'>
