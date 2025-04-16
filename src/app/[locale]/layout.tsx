@@ -8,6 +8,7 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { notFound } from 'next/navigation';
+import { Toaster } from 'sonner';
 
 import '../globals.css';
 
@@ -51,7 +52,10 @@ export default async function LocaleLayout({
       >
         <NextIntlClientProvider>
           <Header />
-          <main className='flex-1'>{children}</main>
+          <main className='flex-1'>
+            {children}
+            <Toaster richColors position='top-right' />
+          </main>
           <Footer />
         </NextIntlClientProvider>
       </body>

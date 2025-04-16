@@ -16,7 +16,7 @@ export const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = useLocale();
-  const t = useTranslations();
+  const t = useTranslations('header');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLocaleChange = (locale: string) => {
@@ -25,7 +25,7 @@ export const Header = () => {
   };
 
   const options = routing.locales.map((locale) => ({
-    label: t(`languages.${locale}`),
+    label: t(`language.${locale}`),
     value: locale,
   }));
 
@@ -41,7 +41,7 @@ export const Header = () => {
       <header className='flex align-center sticky top-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-3 px-6'>
         <div id={styles.logo}>
           <Image src={logo} alt='logo' width={32} height={32} />
-          <strong>ShadMen</strong>
+          <strong>{t('title')}</strong>
         </div>
         <div className={styles.action}>
           <CustomSelect
@@ -54,13 +54,13 @@ export const Header = () => {
             type='button'
             className='p-2 border-1 bg-white text-black dark:bg-background dark:text-white hover:scale-110 transition-transform duration-200'
           >
-            {t('signIn')}
+            {t('nav.signIn')}
           </button>
           <button
             type='button'
             className='p-2 border-1 bg-white text-black dark:bg-background dark:text-white hover:scale-110 transition-transform duration-200'
           >
-            {t('signUp')}
+            {t('nav.signUp')}
           </button>
         </div>
       </header>
