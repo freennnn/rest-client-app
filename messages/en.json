@@ -49,7 +49,11 @@
     "nav": {
       "home": "Home",
       "signIn": "Sign in",
-      "signUp": "Sign up"
+      "signUp": "Sign up",
+      "restClient": "REST Client",
+      "variables": "Variables",
+      "history": "History",
+      "signOut": "Sign out"
     },
     "language": {
       "en": "English",

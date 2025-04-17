@@ -49,7 +49,11 @@
     "nav": {
       "home": "Главная",
       "signIn": "Вход",
-      "signUp": "Регистрация"
+      "signUp": "Регистрация",
+      "restClient": "REST Клиент",
+      "variables": "Переменные",
+      "history": "История",
+      "signOut": "Выход"
     },
     "language": {
       "en": "Английский",

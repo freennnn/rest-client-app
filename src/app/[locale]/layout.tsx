@@ -1,13 +1,15 @@
 import { ReactNode } from 'react';
 
+//import { Header } from '@/features/header/header';
+import { Header } from '@/components/Header';
 import { Footer } from '@/features/footer/footer';
-import { Header } from '@/features/header/header';
 import { routing } from '@/i18n/routing';
+import { cn } from '@/lib/utils';
+import { AuthenticationProvider } from '@/providers/AuthenticationProvider';
 import type { Metadata } from 'next';
-import { NextIntlClientProvider, hasLocale } from 'next-intl';
+import { NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { notFound } from 'next/navigation';
 import { Toaster } from 'sonner';
 
 import '../globals.css';
@@ -39,24 +41,23 @@ export default async function LocaleLayout({
   params: { locale: string };
 }) {
   const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
 
   setRequestLocale(locale);
 
   return (
-    <html lang={locale}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen flex flex-col`}
-      >
+    <html lang={locale} suppressHydrationWarning>
+      <body className={cn(geistSans.variable, geistMono.variable, 'min-h-screen bg-background')}>
         <NextIntlClientProvider>
-          <Header />
-          <main className='flex-1'>
-            {children}
-            <Toaster richColors position='top-right' />
-          </main>
-          <Footer />
+          <AuthenticationProvider>
+            <div className='relative flex min-h-screen flex-col'>
+              <Header />
+              <main className='flex-1'>
+                {children}
+                <Toaster richColors position='top-right' />
+              </main>
+              <Footer />
+            </div>
+          </AuthenticationProvider>
         </NextIntlClientProvider>
       </body>
     </html>

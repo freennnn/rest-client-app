@@ -133,9 +133,10 @@ export async function signOut() {
     const supabase = await createClient();
     await supabase.auth.signOut();
     revalidatePath(homePath(), 'layout');
-    redirect(homePath());
   } catch (error) {
     console.error('Sign out error:', error);
     redirect(errorPath());
   }
+  // redirect is done via error in Next.js server actions, so should be outside catch block
+  redirect(homePath());
 }

@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { Input } from '@/components/ui/input';
 import { Link, useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { homePath } from '@/paths';
+import { homePath, signUpPath } from '@/paths';
 import { type SignInFormValues, signInSchema } from '@/utils/schemas/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
@@ -120,7 +120,7 @@ export function SignInForm({ className, email: initialEmail = '', ...props }: Si
 
             <div className='text-center text-sm'>
               {t('noAccount')}{' '}
-              <Link href='/sign-up' className='text-primary hover:underline'>
+              <Link href={signUpPath()} className='text-primary hover:underline'>
                 {t('signUp')}
               </Link>
             </div>
