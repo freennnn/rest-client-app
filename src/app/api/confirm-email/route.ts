@@ -1,7 +1,9 @@
+import { redirect } from '@/i18n/navigation';
 import { errorPath, homePath } from '@/paths';
 import { createClient } from '@/utils/supabase/server';
 import { type EmailOtpType } from '@supabase/supabase-js';
-import { redirect } from 'next/navigation';
+import { getLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 import { type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -10,18 +12,33 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get('type') as EmailOtpType | null;
   console.log(`next=${searchParams.get('next')}`);
   const next = searchParams.get('next') ?? homePath();
-
+  const locale = await getLocale();
+  const t = await getTranslations('auth.errors');
   if (token_hash && type) {
     const supabase = await createClient();
     const { error } = await supabase.auth.verifyOtp({
       type,
       token_hash,
     });
-    console.log(`confirm error=${error}`);
-    if (!error) {
-      console.log(`confirm redirecting to ${next}`);
-      redirect(next);
+    if (error) {
+      redirect({
+        href: `${errorPath()}?error=${error.message}`,
+        locale,
+      });
     }
+    console.log(`confirm redirecting to ${next}`);
+    redirect({
+      href: next,
+      locale,
+    });
   }
-  redirect(errorPath());
+  redirect({
+    href: {
+      pathname: errorPath(),
+      query: {
+        error: t('noToken'),
+      },
+    },
+    locale,
+  });
 }

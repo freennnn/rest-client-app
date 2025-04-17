@@ -1,11 +1,64 @@
 {
   "MainPage": {
-    "title": "Main Page"
+    "title": "Welcome to our application"
   },
-  "signIn": "Sign In",
-  "signUp": "Sign Up",
-  "languages": {
-    "en": "English",
-    "ru": "Russian"
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "email": "Email",
+    "password": "Password",
+    "validation": {
+      "emailInvalid": "Please enter a valid email address",
+      "passwordMinLength": "Password must be at least 8 characters long",
+      "passwordLetter": "Password must contain at least one letter",
+      "passwordDigit": "Password must contain at least one digit",
+      "passwordSpecial": "Password must contain at least one special character",
+      "nameRequired": "Name is required",
+      "nameMinLength": "Name must be at least 2 characters long",
+      "passwordConfirm": "Passwords do not match"
+    },
+    "loginTitle": "Welcome back",
+    "loginDescription": "Enter your credentials to access your account",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "passwordLabel": "Password",
+    "forgotPassword": "Forgot password?",
+    "loginSuccessTitle": "Login successful",
+    "loginSuccessDescription": "You have been successfully logged in",
+    "loginErrorTitle": "Login failed",
+    "loggingIn": "Signing in...",
+    "noAccount": "Don't have an account?",
+    "signUpTitle": "Create an account",
+    "signUpDescription": "Enter your information to create your account",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter your name",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "signUpSuccessTitle": "Account created",
+    "signUpSuccessDescription": "Your account has been created successfully",
+    "signUpErrorTitle": "Sign up failed",
+    "signingUp": "Creating account...",
+    "haveAccount": "Already have an account?",
+    "errors": {
+      "noToken": "Missing or invalid confirmation token"
+    }
+  },
+  "header": {
+    "title": "REST Client",
+    "nav": {
+      "home": "Home",
+      "signIn": "Sign in",
+      "signUp": "Sign up"
+    },
+    "language": {
+      "en": "English",
+      "ru": "Russian"
+    }
+  },
+  "error": {
+    "title": "Sorry, something went wrong",
+    "withError": "Error: {error}",
+    "withoutError": "An unspecified error occurred"
   }
 }
