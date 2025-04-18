@@ -10,9 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Link, useRouter } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { homePath, signUpPath } from '@/paths';
+import { signUpPath } from '@/paths';
 import { type SignInFormValues, signInSchema } from '@/utils/schemas/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
@@ -25,7 +25,6 @@ interface SignInFormProps extends React.ComponentPropsWithoutRef<'div'> {
 
 export function SignInForm({ className, email: initialEmail = '', ...props }: SignInFormProps) {
   const t = useTranslations('auth');
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<SignInFormValues>({
@@ -38,15 +37,6 @@ export function SignInForm({ className, email: initialEmail = '', ...props }: Si
 
   const initialState = { errors: {} };
   const [state, formAction] = useActionState<SignInFormState, FormData>(signIn, initialState);
-
-  useEffect(() => {
-    if (state.success) {
-      toast.success(t('loginSuccessTitle'), {
-        description: t('loginSuccessDescription'),
-      });
-      router.push(homePath());
-    }
-  }, [state.success, router, t]);
 
   useEffect(() => {
     if (state.errors?._form) {

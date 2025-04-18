@@ -42,7 +42,12 @@
     "haveAccount": "Already have an account?",
     "errors": {
       "noToken": "Missing or invalid confirmation token"
-    }
+    },
+    "signOutErrorTitle": "Sign Out Failed",
+    "signOutErrorDescription": "Could not sign out. Please try again.",
+    "signingOut": "Signing Out...",
+    "userAlreadyExistTitle": "User already exists",
+    "userAlreadyExistDescription": "Please sign in to continue"
   },
   "header": {
     "title": "REST Client",

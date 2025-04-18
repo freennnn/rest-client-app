@@ -1,6 +1,6 @@
 'use server';
 
-import { confirmEmailPath, errorPath, homePath, signInPath } from '@/paths';
+import { confirmEmailPath, homePath, signInPath } from '@/paths';
 import { signInSchema, signUpSchema } from '@/utils/schemas/auth';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
@@ -26,6 +26,7 @@ export type SignUpFormState = SignInFormState & {
   };
 };
 
+// success = redirect to confirmEmailPath(email), toast here only if errors
 export async function signUp(
   prevState: SignUpFormState,
   formData: FormData
@@ -45,7 +46,28 @@ export async function signUp(
 
     const supabase = await createClient();
 
-    const { data: responseData, error } = await supabase.auth.signUp({
+    // Check if user already exists (optional, but good practice)
+    const { data: existingUser, error: fetchError } = await supabase
+      .from('users') // Adjust if your profile table is different
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      // Ignore 'not found' error
+      throw fetchError;
+    }
+
+    if (existingUser) {
+      // Redirect to sign-in page with email pre-filled
+      redirect(`${signInPath(email)}?toast=user_already-exist`);
+      // return {
+      //   errors: { _form: ['User with this email already exists.'] },
+      //   success: false,
+      // };
+    }
+
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -56,36 +78,24 @@ export async function signUp(
     });
 
     if (error) {
+      console.error('Sign up error:', error);
       return {
-        errors: {
-          _form: [error.message],
-        },
+        errors: { _form: ['Sign up failed: ' + error.message] },
+        success: false,
       };
     }
 
-    // Check if this is an existing user (no identities array)
-    // When a user tries to sign up with an email that already exists, Supabase doesn't return an error
-    // Instead it returns a user object with empty identities array
-    if (!responseData.user?.identities?.length) {
-      // Redirect to sign-in page with email pre-filled
-      redirect(signInPath(email));
-    }
-
-    // If email confirmation is required
-    if (!responseData.user?.email_confirmed_at) {
-      redirect(confirmEmailPath(responseData.user?.email ?? email));
-    }
-
-    return { success: true };
+    redirect(confirmEmailPath(email));
   } catch (error) {
+    console.error('Sign up error:', error);
     return {
-      errors: {
-        _form: [`An unexpected error ${error} occurred. Please try again later.`],
-      },
+      errors: { _form: ['Sign up failed: An unexpected error occurred.'] },
+      success: false,
     };
   }
 }
 
+// success = redirect to homePath() with toast there, toast here only if errors
 export async function signIn(
   prevState: SignInFormState,
   formData: FormData
@@ -101,7 +111,6 @@ export async function signIn(
         errors: result.error.flatten().fieldErrors,
       };
     }
-
     const supabase = await createClient();
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -110,33 +119,50 @@ export async function signIn(
     });
 
     if (error) {
+      console.error('Sign in error:', error);
+      // Return error state for useActionState on the client
       return {
         errors: {
-          _form: [error.message],
+          _form: ['Sign in failed: ' + (error instanceof Error ? error.message : 'Supabase error')],
         },
+        success: false,
       };
     }
-
-    return { success: true };
   } catch (error) {
     console.error('Sign in error:', error);
     return {
       errors: {
-        _form: [`An unexpected error ${error} occurred. Please try again later.`],
+        _form: ['Sign in failed: ' + (error instanceof Error ? error.message : 'Unknown error')],
       },
+      success: false,
     };
   }
+
+  // --- SUCCESS ---
+  // 1. Invalidate Cache
+  revalidatePath('/', 'layout');
+
+  // 2. Force a refresh of the auth state
+  const supabase = await createClient();
+  await supabase.auth.refreshSession();
+
+  // 3. Redirect with a success flag for the toast
+  redirect(homePath() + '?toast=signin_success');
 }
 
+// both cases redirect with toast there
 export async function signOut() {
-  try {
-    const supabase = await createClient();
-    await supabase.auth.signOut();
-    revalidatePath(homePath(), 'layout');
-  } catch (error) {
-    console.error('Sign out error:', error);
-    redirect(errorPath());
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error('Error signing out:', error);
+    redirect(`${homePath()}?toast=signout_error`);
   }
-  // redirect is done via error in Next.js server actions, so should be outside catch block
-  redirect(homePath());
+
+  // Force a refresh of the auth state
+  await supabase.auth.refreshSession();
+
+  revalidatePath(homePath(), 'layout');
+  redirect(`${homePath()}?toast=signout_success`);
 }

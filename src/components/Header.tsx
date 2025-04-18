@@ -1,9 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { signOut } from '@/actions/authActions';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,30 +22,35 @@ import {
 } from '@/paths';
 import { useAuth } from '@/providers/AuthenticationProvider';
 import { Loader2 } from 'lucide-react';
-import { useLocale } from 'next-intl';
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+
+import { SignOutButton } from './SignOutButton';
+import { Button } from './ui/button';
 
 export function Header() {
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const t = useTranslations('header');
-  const { isAuthenticated } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-
-  const [isLoading, setIsLoading] = useState(false);
-
+  const [isLocaleLoading, setIsLocaleLoading] = useState(false);
   const currentLocale = useLocale();
 
   const handleLocaleChange = (newLocale: string) => {
-    if (newLocale === currentLocale || isLoading) return;
+    if (newLocale === currentLocale || isLocaleLoading) return;
 
-    setIsLoading(true);
-    try {
-      router.replace(pathname, { locale: newLocale });
-    } catch (error) {
-      console.error('Failed to change locale:', error);
-      setIsLoading(false);
-    }
+    setIsLocaleLoading(true);
+
+    router.replace(pathname, { locale: newLocale });
   };
+
+  useEffect(() => {
+    if (isLocaleLoading) {
+      setIsLocaleLoading(false);
+    }
+  }, [currentLocale, isLocaleLoading]);
+
+  const isLoading = isAuthLoading || isLocaleLoading;
 
   return (
     <header
@@ -96,7 +99,7 @@ export function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant='ghost' size='sm' disabled={isLoading}>
-                  {isLoading ? (
+                  {isLocaleLoading ? (
                     <Loader2 className='h-4 w-4 animate-spin' />
                   ) : (
                     t(`language.${currentLocale}`)
@@ -107,7 +110,7 @@ export function Header() {
                 {routing.locales.map((locale) => (
                   <DropdownMenuItem
                     key={locale}
-                    onClick={() => handleLocaleChange(locale)}
+                    onClick={() => handleLocaleChange(locale as string)}
                     disabled={currentLocale === locale || isLoading}
                   >
                     {t(`language.${locale}`)}
@@ -126,15 +129,7 @@ export function Header() {
               </Button>
             </div>
           ) : (
-            <Button
-              variant='ghost'
-              size='sm'
-              onClick={() => {
-                signOut();
-              }}
-            >
-              {t('nav.signOut')}
-            </Button>
+            <SignOutButton />
           )}
         </div>
       </div>
