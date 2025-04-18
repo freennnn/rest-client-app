@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 
+import HydrationErrorHandler from '@/components/HydrationErrorHandler';
 import { Footer } from '@/features/footer/footer';
 import { Header } from '@/features/header/header';
 import { routing } from '@/i18n/routing';
@@ -38,7 +39,7 @@ export default async function LocaleLayout({
   children: ReactNode;
   params: { locale: string };
 }) {
-  const { locale } = await params;
+  const { locale } = params;
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
@@ -46,10 +47,12 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen flex flex-col`}
+        suppressHydrationWarning
       >
+        <HydrationErrorHandler />
         <NextIntlClientProvider>
           <Header />
           <main className='flex-1'>

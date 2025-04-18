@@ -8,11 +8,14 @@ import { useCodeGenerator } from '@/hooks/useCodeGenerator';
 import { Header, ResponseData } from '@/types/types';
 import { sendRequest } from '@/utils/rest-client/httpClient';
 import {
+  decodeHeaderKeyValue,
   decodeRequestBody,
   decodeRequestUrl,
+  encodeHeaderKeyValue,
   encodeRequestBody,
   encodeRequestUrl,
 } from '@/utils/rest-client/urlEncoder';
+import { hasVariables } from '@/utils/variables/variableSubstitution';
 import { useSearchParams } from 'next/navigation';
 
 type RestClientPageProps = {
@@ -34,63 +37,59 @@ export default function RestClientPage({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [headers, setHeaders] = useState<Header[]>([]);
+  const [usingVariables, setUsingVariables] = useState(false);
 
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    /*
-    const path = window.location.pathname;
-    const pathParts = path.split('/').filter(Boolean);
+    const checkForVariables = () => {
+      const urlHasVars = hasVariables(url);
+      const bodyHasVars = hasVariables(requestBody);
+      const headersHaveVars = headers.some(
+        (header) => hasVariables(header.key) || hasVariables(header.value)
+      );
 
-    if (pathParts.length >= 1) {
-      const urlMethod = pathParts[0];
-      if (['GET', 'POST', 'PUT', 'DELETE'].includes(urlMethod)) {
-        setMethod(urlMethod);
-      }
+      setUsingVariables(urlHasVars || bodyHasVars || headersHaveVars);
+    };
 
-      if (pathParts.length >= 2) {
-        try {
-          const decodedUrl = decodeRequestUrl(pathParts[1]);
-          setUrl(decodedUrl);
-        } catch (err) {
-          console.error('Failed to decode URL', err);
-        }
-      }
-    }
-    if (pathParts.length >= 3 && (urlMethod === 'POST' || urlMethod === 'PUT')) {
-      try {
-        const decodedBody = decodeRequestBody(pathParts[2]);
-        setRequestBody(decodedBody);
-      } catch (err) {
-        console.error('Failed to decode request body', err);
-      }
-    }*/
+    checkForVariables();
+  }, [url, requestBody, headers]);
 
+  useEffect(() => {
     if (encodedUrl) {
       try {
         const decodedUrl = decodeRequestUrl(encodedUrl);
         setUrl(decodedUrl);
       } catch (err) {
         console.error('Failed to decode URL', err);
+        setUrl(encodedUrl);
       }
     }
 
-    if (encodedBody && (method === 'POST' || method === 'PUT')) {
+    if (encodedBody && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
       try {
         const decodedBody = decodeRequestBody(encodedBody);
         setRequestBody(decodedBody);
       } catch (err) {
         console.error('Failed to decode request body', err);
+        setRequestBody('');
       }
     }
 
     const headerEntries: Header[] = [];
-    searchParams.forEach((value, key) => {
-      headerEntries.push({
-        id: `header-${Date.now()}-${key}`,
-        key,
-        value: decodeURIComponent(value),
-      });
+    searchParams.forEach((encodedValue, encodedKey) => {
+      try {
+        const key = decodeHeaderKeyValue(encodedKey);
+        const value = decodeHeaderKeyValue(encodedValue);
+
+        headerEntries.push({
+          id: `header-${Date.now()}-${key}`,
+          key,
+          value,
+        });
+      } catch (err) {
+        console.error('Failed to decode header', err);
+      }
     });
 
     if (headerEntries.length > 0) {
@@ -134,7 +133,9 @@ export default function RestClientPage({
       const queryParams = new URLSearchParams();
       headers.forEach((header) => {
         if (header.key.trim() && header.value.trim()) {
-          queryParams.append(header.key, encodeURIComponent(header.value));
+          const encodedKey = encodeHeaderKeyValue(header.key);
+          const encodedValue = encodeHeaderKeyValue(header.value);
+          queryParams.append(encodedKey, encodedValue);
         }
       });
 
@@ -155,6 +156,27 @@ export default function RestClientPage({
     <div className='min-h-screen p-4 max-w-5xl mx-auto'>
       <header className='mb-6'>
         <h1 className='text-2xl font-bold mb-2'>RESTful Client</h1>
+        {usingVariables && (
+          <div className='bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-2 mb-4 rounded'>
+            <p className='flex items-center'>
+              <svg
+                className='w-4 h-4 mr-2'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                ></path>
+              </svg>
+              This request uses variables that will be substituted when sent.
+            </p>
+          </div>
+        )}
       </header>
 
       <RequestForm
