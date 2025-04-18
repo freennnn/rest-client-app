@@ -1,3 +1,4 @@
+import { AuthRedirectRefresher } from '@/components/AuthRedirectRefresher';
 import { Header } from '@/components/Header';
 import { ToastHandler } from '@/components/ToastHandler';
 import { Footer } from '@/features/footer/footer';
@@ -26,6 +27,7 @@ export default async function LocaleLayout({
       <body className={cn(geistSans.variable, geistMono.variable, 'min-h-screen bg-background')}>
         <NextIntlClientProvider>
           <AuthenticationProvider>
+            <AuthRedirectRefresher />
             <div className='relative flex min-h-screen flex-col'>
               <Header />
               <main className='flex-1'>{children}</main>

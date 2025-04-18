@@ -140,14 +140,10 @@ export async function signIn(
 
   // --- SUCCESS ---
   // 1. Invalidate Cache
-  revalidatePath('/', 'layout');
+  revalidatePath(homePath(), 'layout');
 
-  // 2. Force a refresh of the auth state
-  const supabase = await createClient();
-  await supabase.auth.refreshSession();
-
-  // 3. Redirect with a success flag for the toast
-  redirect(homePath() + '?toast=signin_success');
+  // 2. Redirect with success flag for toast and auth event for AuthRedirectRefresher
+  redirect(homePath() + '?toast=signin_success&authEvent=true');
 }
 
 // both cases redirect with toast there
@@ -160,9 +156,6 @@ export async function signOut() {
     redirect(`${homePath()}?toast=signout_error`);
   }
 
-  // Force a refresh of the auth state
-  await supabase.auth.refreshSession();
-
   revalidatePath(homePath(), 'layout');
-  redirect(`${homePath()}?toast=signout_success`);
+  redirect(`${homePath()}?toast=signout_success&authEvent=true`);
 }
