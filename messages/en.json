@@ -27,6 +27,8 @@
     "loginSuccessTitle": "Login successful",
     "loginSuccessDescription": "You have been successfully logged in",
     "loginErrorTitle": "Login failed",
+    "signInFailedCredentials": "Invalid login credentials. Please check your email and password.",
+    "signInFailedGeneric": "Sign in failed. Please try again later.",
     "loggingIn": "Signing in...",
     "noAccount": "Don't have an account?",
     "signUpTitle": "Create an account",
@@ -38,6 +40,7 @@
     "signUpSuccessTitle": "Account created",
     "signUpSuccessDescription": "Your account has been created successfully",
     "signUpErrorTitle": "Sign up failed",
+    "signUpFailedGeneric": "Sign up failed. Please try again later.",
     "signingUp": "Creating account...",
     "haveAccount": "Already have an account?",
     "errors": {
@@ -46,6 +49,7 @@
     "signOutErrorTitle": "Sign Out Failed",
     "signOutErrorDescription": "Could not sign out. Please try again.",
     "signingOut": "Signing Out...",
+    "signOutSuccessTitle": "Signed out successfully",
     "userAlreadyExistTitle": "User already exists",
     "userAlreadyExistDescription": "Please sign in to continue"
   },

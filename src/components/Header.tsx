@@ -36,7 +36,18 @@ export function Header() {
   const [isLocaleLoading, setIsLocaleLoading] = useState(false);
   const currentLocale = useLocale();
 
+  console.log('[Header] Rendering, currentLocale from useLocale():', currentLocale);
+  console.log("[Header] Translation for 'nav.signIn':", t('nav.signIn'));
+
   const handleLocaleChange = (newLocale: string) => {
+    console.log(
+      '[Header] handleLocaleChange: currentLocale=',
+      currentLocale,
+      'newLocale=',
+      newLocale,
+      'pathname=',
+      pathname
+    );
     if (newLocale === currentLocale || isLocaleLoading) return;
 
     setIsLocaleLoading(true);
@@ -45,6 +56,8 @@ export function Header() {
   };
 
   useEffect(() => {
+    // Optional: Log when effect runs
+    // console.log('[Header] useEffect running, isLocaleLoading:', isLocaleLoading, 'currentLocale:', currentLocale);
     if (isLocaleLoading) {
       setIsLocaleLoading(false);
     }

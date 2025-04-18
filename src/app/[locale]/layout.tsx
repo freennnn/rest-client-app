@@ -1,11 +1,8 @@
-import { AuthRedirectRefresher } from '@/components/AuthRedirectRefresher';
 import { Header } from '@/components/Header';
-import { ToastHandler } from '@/components/ToastHandler';
 import { Footer } from '@/features/footer/footer';
 import { cn } from '@/lib/utils';
 import { AuthenticationProvider } from '@/providers/AuthenticationProvider';
-import { NextIntlClientProvider } from 'next-intl';
-import { Locale } from 'next-intl';
+import { Locale, NextIntlClientProvider } from 'next-intl';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 
@@ -22,19 +19,18 @@ export default async function LocaleLayout({
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={cn(geistSans.variable, geistMono.variable, 'min-h-screen bg-background')}>
         <NextIntlClientProvider>
           <AuthenticationProvider>
-            <AuthRedirectRefresher />
             <div className='relative flex min-h-screen flex-col'>
               <Header />
               <main className='flex-1'>{children}</main>
               <Footer />
             </div>
-            <Toaster richColors position='top-right' />
-            <ToastHandler />
+            <Toaster richColors position='bottom-right' />
           </AuthenticationProvider>
         </NextIntlClientProvider>
       </body>

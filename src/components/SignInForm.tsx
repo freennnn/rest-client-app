@@ -1,15 +1,13 @@
 'use client';
 
-import { startTransition, useEffect, useState } from 'react';
-import { useActionState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { SignInFormState, signIn } from '@/actions/authActions';
 import { TranslatedFormMessage } from '@/components/ui/TranslateFormMessage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useAuthActions } from '@/hooks/useAuthActions';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { signUpPath } from '@/paths';
@@ -17,7 +15,6 @@ import { type SignInFormValues, signInSchema } from '@/utils/schemas/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { toast } from 'sonner';
 
 interface SignInFormProps extends React.ComponentPropsWithoutRef<'div'> {
   email?: string;
@@ -25,7 +22,7 @@ interface SignInFormProps extends React.ComponentPropsWithoutRef<'div'> {
 
 export function SignInForm({ className, email: initialEmail = '', ...props }: SignInFormProps) {
   const t = useTranslations('auth');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { signIn, isPending } = useAuthActions();
 
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
@@ -35,25 +32,8 @@ export function SignInForm({ className, email: initialEmail = '', ...props }: Si
     },
   });
 
-  const initialState = { errors: {} };
-  const [state, formAction] = useActionState<SignInFormState, FormData>(signIn, initialState);
-
-  useEffect(() => {
-    if (state.errors?._form) {
-      toast.error(state.errors._form[0]);
-      setIsSubmitting(false);
-    }
-  }, [state.errors]);
-
   const onSubmit = async (data: SignInFormValues) => {
-    setIsSubmitting(true);
-    const formData = new FormData();
-    formData.append('email', data.email);
-    formData.append('password', data.password);
-
-    startTransition(() => {
-      formAction(formData);
-    });
+    await signIn(data.email, data.password);
   };
 
   return (
@@ -72,7 +52,7 @@ export function SignInForm({ className, email: initialEmail = '', ...props }: Si
                 <FormItem>
                   <FormLabel>{t('email')}</FormLabel>
                   <FormControl>
-                    <Input placeholder='example@email.com' {...field} disabled={isSubmitting} />
+                    <Input placeholder='example@email.com' {...field} disabled={isPending} />
                   </FormControl>
                   {fieldState.error?.message && (
                     <TranslatedFormMessage>{fieldState.error.message}</TranslatedFormMessage>
@@ -88,7 +68,7 @@ export function SignInForm({ className, email: initialEmail = '', ...props }: Si
                 <FormItem>
                   <FormLabel>{t('password')}</FormLabel>
                   <FormControl>
-                    <Input type='password' {...field} disabled={isSubmitting} />
+                    <Input type='password' {...field} disabled={isPending} />
                   </FormControl>
                   {fieldState.error?.message && (
                     <TranslatedFormMessage>{fieldState.error.message}</TranslatedFormMessage>
@@ -97,8 +77,8 @@ export function SignInForm({ className, email: initialEmail = '', ...props }: Si
               )}
             />
 
-            <Button type='submit' className='w-full' disabled={isSubmitting}>
-              {isSubmitting ? (
+            <Button type='submit' className='w-full' disabled={isPending}>
+              {isPending ? (
                 <>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                   {t('loggingIn')}
