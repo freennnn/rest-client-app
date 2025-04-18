@@ -1,11 +1,64 @@
 {
   "MainPage": {
-    "title": "Главная страница"
+    "title": "Добро пожаловать в наше приложение"
   },
-  "signIn": "Войти",
-  "signUp": "Регистрация",
-  "languages": {
-    "en": "English",
-    "ru": "Russian"
+  "auth": {
+    "signIn": "Войти",
+    "signUp": "Регистрация",
+    "signOut": "Выйти",
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "validation": {
+      "emailInvalid": "Пожалуйста, введите корректный email",
+      "passwordMinLength": "Пароль должен содержать минимум 8 символов",
+      "passwordLetter": "Пароль должен содержать хотя бы одну букву",
+      "passwordDigit": "Пароль должен содержать хотя бы одну цифру",
+      "passwordSpecial": "Пароль должен содержать хотя бы один специальный символ",
+      "nameRequired": "Имя обязательно",
+      "nameMinLength": "Имя должно содержать минимум 2 символа",
+      "passwordConfirm": "Пароли не совпадают"
+    },
+    "loginTitle": "Добро пожаловать",
+    "loginDescription": "Введите свои данные для входа в аккаунт",
+    "emailLabel": "Электронная почта",
+    "emailPlaceholder": "Введите ваш email",
+    "passwordLabel": "Пароль",
+    "forgotPassword": "Забыли пароль?",
+    "loginSuccessTitle": "Вход выполнен успешно",
+    "loginSuccessDescription": "Вы успешно вошли в систему",
+    "loginErrorTitle": "Ошибка входа",
+    "loggingIn": "Вход в систему...",
+    "noAccount": "Нет аккаунта?",
+    "signUpTitle": "Создание аккаунта",
+    "signUpDescription": "Введите свои данные для создания аккаунта",
+    "nameLabel": "Имя",
+    "namePlaceholder": "Введите ваше имя",
+    "confirmPasswordLabel": "Подтверждение пароля",
+    "confirmPasswordPlaceholder": "Подтвердите ваш пароль",
+    "signUpSuccessTitle": "Аккаунт создан",
+    "signUpSuccessDescription": "Ваш аккаунт успешно создан",
+    "signUpErrorTitle": "Ошибка регистрации",
+    "signingUp": "Создание аккаунта...",
+    "haveAccount": "Уже есть аккаунт?",
+    "errors": {
+      "noToken": "Отсутствует или неверный токен подтверждения"
+    }
+  },
+  "header": {
+    "title": "REST Клиент",
+    "nav": {
+      "home": "Главная",
+      "signIn": "Вход",
+      "signUp": "Регистрация"
+    },
+    "language": {
+      "en": "Английский",
+      "ru": "Русский"
+    }
+  },
+  "error": {
+    "title": "Извините, что-то пошло не так",
+    "withError": "Ошибка: {error}",
+    "withoutError": "Произошла неизвестная ошибка"
   }
 }

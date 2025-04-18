@@ -1,0 +1,16 @@
+{
+  "MainPage": {
+    "title": "Welcome to our app"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "validation": {
+      "email": "Please enter a valid email address",
+      "password": "Password must be at least 6 characters"
+    }
+  }
+}

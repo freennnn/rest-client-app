@@ -1,4 +1,4 @@
-import { signIn } from '@/actions/authActions';
+import { SignInForm } from '@/components/SignInForm';
 
 export default async function SignInPage({
   searchParams,
@@ -9,12 +9,10 @@ export default async function SignInPage({
   const email = typeof params.email === 'string' ? params.email : '';
 
   return (
-    <form>
-      <label htmlFor='email'>Email:</label>
-      <input id='email' name='email' type='email' required defaultValue={email} />
-      <label htmlFor='password'>Password:</label>
-      <input id='password' name='password' type='password' required />
-      <button formAction={signIn}>Sign in</button>
-    </form>
+    <div className='flex min-h-svh w-full items-center justify-center p-6 md:p-10'>
+      <div className='w-full max-w-sm'>
+        <SignInForm email={email} />
+      </div>
+    </div>
   );
 }

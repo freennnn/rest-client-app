@@ -17,7 +17,7 @@ export const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = useLocale();
-  const t = useTranslations();
+  const t = useTranslations('header');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLocaleChange = (locale: string) => {
@@ -26,7 +26,7 @@ export const Header = () => {
   };
 
   const options = routing.locales.map((locale) => ({
-    label: t(`languages.${locale}`),
+    label: t(`language.${locale}`),
     value: locale,
   }));
 
@@ -46,6 +46,7 @@ export const Header = () => {
             <strong>ShadMen</strong>
           </div>
         </Link>
+
         <div className={styles.action}>
           <CustomSelect
             icon={langLogo}
@@ -57,13 +58,13 @@ export const Header = () => {
             type='button'
             className='p-2 border-1 bg-white text-black dark:bg-background dark:text-white hover:scale-110 transition-transform duration-200'
           >
-            {t('signIn')}
+            {t('nav.signIn')}
           </button>
           <button
             type='button'
             className='p-2 border-1 bg-white text-black dark:bg-background dark:text-white hover:scale-110 transition-transform duration-200'
           >
-            {t('signUp')}
+            {t('nav.signUp')}
           </button>
         </div>
       </header>
