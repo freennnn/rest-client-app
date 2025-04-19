@@ -1,8 +1,18 @@
-export interface Header {
+export interface ResponseData {
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+  body: string;
+  parsedBody: unknown;
+  duration: number;
+  size: number;
+}
+
+export type Header = {
   id: string;
   key: string;
   value: string;
-}
+};
 
 export interface ResponseData {
   status: number;

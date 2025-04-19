@@ -1,67 +1,82 @@
-import { Header, ResponseData } from '../../types/types';
+import { Header, ResponseData } from '@/types/types';
+
+import { processBody, processHeaders, processUrl } from '../variables/variableSubstitution';
 
 export async function sendRequest(
   url: string,
   method: string,
   headers: Header[],
   contentType: string,
-  requestBody: string
+  body?: string
 ): Promise<ResponseData> {
-  if (!url || url.trim() === '') {
-    throw new Error('URL cannot be empty');
-  }
+  const processedUrl = processUrl(url);
+  const processedHeaders = processHeaders(headers);
+  const processedBody = body ? processBody(body) : undefined;
 
-  let requestUrl = url.trim();
-  if (!/^https?:\/\//i.test(requestUrl)) {
-    requestUrl = `https://${requestUrl}`;
-  }
+  const startTime = Date.now();
 
   try {
-    new URL(requestUrl);
-  } catch {
-    throw new Error('Invalid URL format');
-  }
+    const requestOptions: RequestInit = {
+      method,
+      headers: {
+        ...(contentType && { 'Content-Type': contentType }),
+        ...processedHeaders.reduce(
+          (acc, header) => {
+            if (header.key && header.value) {
+              acc[header.key] = header.value;
+            }
+            return acc;
+          },
+          {} as Record<string, string>
+        ),
+      },
+      ...(['POST', 'PUT', 'PATCH'].includes(method) && processedBody
+        ? { body: processedBody }
+        : {}),
+    };
 
-  const startTime = performance.now();
+    const response = await fetch(processedUrl, requestOptions);
+    const endTime = Date.now();
+    const duration = endTime - startTime;
 
-  const headersObj: Record<string, string> = {};
-  if (method === 'POST' || method === 'PUT') {
-    headersObj['Content-Type'] = contentType;
-  }
+    const contentTypeHeader = response.headers.get('Content-Type') || '';
+    let responseBody: string;
+    let parsedBody: unknown;
 
-  headers.forEach((header) => {
-    if (header.key.trim()) {
-      headersObj[header.key] = header.value;
-    }
-  });
-
-  const options: RequestInit = {
-    method,
-    headers: headersObj,
-    body: method === 'POST' || method === 'PUT' ? requestBody : undefined,
-  };
-
-  const response = await fetch(requestUrl, options);
-
-  const endTime = performance.now();
-
-  let responseBody;
-  const contentTypeHeader = response.headers.get('content-type');
-
-  try {
-    if (contentTypeHeader && contentTypeHeader.includes('application/json')) {
-      responseBody = JSON.stringify(await response.json(), null, 2);
-    } else {
+    if (contentTypeHeader.includes('application/json')) {
       responseBody = await response.text();
+      try {
+        parsedBody = JSON.parse(responseBody);
+      } catch {
+        parsedBody = null;
+      }
+    } else if (contentTypeHeader.includes('text/')) {
+      responseBody = await response.text();
+      parsedBody = null;
+    } else {
+      responseBody = '[Binary data not displayed]';
+      parsedBody = null;
     }
-  } catch {
-    responseBody = await response.text();
-  }
 
-  return {
-    status: response.status,
-    statusText: response.statusText,
-    body: responseBody,
-    time: Math.round(endTime - startTime),
-  };
+    const responseHeaders: Record<string, string> = {};
+    response.headers.forEach((value, key) => {
+      responseHeaders[key] = value;
+    });
+
+    return {
+      status: response.status,
+      statusText: response.statusText,
+      headers: responseHeaders,
+      body: responseBody,
+      parsedBody,
+      duration,
+      size: new TextEncoder().encode(responseBody).length,
+    };
+  } catch (error) {
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    throw new Error(
+      `Request failed: ${error instanceof Error ? error.message : String(error)} (after ${duration}ms)`
+    );
+  }
 }

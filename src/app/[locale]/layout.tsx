@@ -1,10 +1,12 @@
 import { Header } from '@/components/Header';
+import HydrationErrorHandler from '@/components/HydrationErrorHandler';
 import { Footer } from '@/features/footer/footer';
-import { cn } from '@/lib/utils';
+import { routing } from '@/i18n/routing';
 import { AuthenticationProvider } from '@/providers/AuthenticationProvider';
-import { Locale, NextIntlClientProvider } from 'next-intl';
+import { Locale, NextIntlClientProvider, hasLocale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { notFound } from 'next/navigation';
 import { Toaster } from 'sonner';
 
 import '../globals.css';
@@ -21,11 +23,19 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
 
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
   setRequestLocale(locale);
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={cn(geistSans.variable, geistMono.variable, 'min-h-screen bg-background')}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen flex flex-col`}
+        suppressHydrationWarning
+      >
+        <HydrationErrorHandler />
         <NextIntlClientProvider>
           <AuthenticationProvider>
             <div className='relative flex min-h-screen flex-col'>
