@@ -1,5 +1,5 @@
 export const homePath = () => '/';
-export const authenticatedPathesPrefix = () => ['/rest', '/variables'];
+export const authenticatedPathesPrefix = () => ['/rest', '/variables', '/history'];
 export const signInPath = (email?: string) => {
   return pathWithEmail('/auth/signin', email);
 };

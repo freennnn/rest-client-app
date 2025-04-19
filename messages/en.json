@@ -122,5 +122,17 @@
     "title": "Sorry, something went wrong",
     "withError": "Error: {error}",
     "withoutError": "An unspecified error occurred"
+  },
+  "NotFoundPage": {
+    "title": "Page Not Found",
+    "description": "Sorry, the page you are looking for does not exist.",
+    "backToHome": "Go back home",
+    "metadataTitle": "404 - Page Not Found"
+  },
+  "ErrorPage": {
+    "title": "Something went wrong!",
+    "description": "An unexpected error occurred.",
+    "tryAgain": "Try again",
+    "backToHome": "Go back home"
   }
 }

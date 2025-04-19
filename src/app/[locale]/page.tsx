@@ -43,6 +43,9 @@ export default async function IndexPage({ params }: Props) {
   const user = userData?.user;
   const t = await getTranslations('MainPage');
 
+  // if (process.env.NODE_ENV === 'development') {
+  //   throw new Error('Simulated error to test error boundary!');
+  // }
   return (
     <div className='container mx-auto max-w-4xl py-10 px-4'>
       {/* === Top Section: Title & Auth === */}

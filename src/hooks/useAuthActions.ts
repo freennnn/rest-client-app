@@ -125,6 +125,7 @@ export function useAuthActions() {
 
       toast.success(t('signOutSuccessTitle'));
       router.push(homePath());
+      router.refresh();
       return { success: true };
     } catch {
       const errorMessage = t('signOutErrorTitle');
