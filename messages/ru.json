@@ -2,6 +2,7 @@
   "MainPage": {
     "title": "Добро пожаловать",
     "welcomeBack": "С возвращением, {name}!",
+    "userName": "Пользователь",
     "signIn": "Войти",
     "signUp": "Регистрация",
     "projectOverviewTitle": "Обзор проекта",

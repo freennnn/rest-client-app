@@ -37,7 +37,6 @@ export default async function IndexPage({ params }: Props) {
 
   setRequestLocale(locale);
 
-  // Await the async server client creation
   const supabase = await createClient();
 
   const { data: userData } = await supabase.auth.getUser();
@@ -50,7 +49,7 @@ export default async function IndexPage({ params }: Props) {
       {user ? (
         <div className='mb-12 text-center'>
           <h1 className='text-3xl font-bold tracking-tight'>
-            {t('welcomeBack', { name: user.user_metadata?.name || 'User' })}
+            {t('welcomeBack', { name: user.user_metadata?.name || t('userName') })}
           </h1>
         </div>
       ) : (
