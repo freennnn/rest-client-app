@@ -1,6 +1,9 @@
 {
   "MainPage": {
-    "title": "Welcome to our application"
+    "title": "Welcome!",
+    "welcomeBack": "Welcome back, {name}!",
+    "signIn": "Sign In",
+    "signUp": "Sign Up"
   },
   "auth": {
     "signIn": "Sign in",

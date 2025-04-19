@@ -1,5 +1,9 @@
+import { Button } from '@/components/ui/button';
+import { Link } from '@/i18n/navigation';
+import { signInPath, signUpPath } from '@/paths';
+import { createClient } from '@/utils/supabase/server';
 import { Locale } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 type Props = {
   params: Promise<{ locale: Locale }>;
@@ -20,7 +24,7 @@ type Props = {
 
 export default async function IndexPage({ params }: Props) {
   const { locale } = await params;
-  console.log('IndexPage locale =', locale);
+  // console.log('IndexPage locale =', locale);
 
   // next-intl uses its middleware to attach an x-next-intl-locale header to the incoming request,
   // holding the negotiated locale as a value. This technique allows the locale
@@ -31,12 +35,36 @@ export default async function IndexPage({ params }: Props) {
   // in layouts and pages via params) to next-intl. All APIs from next-intl
   // can now read from this value instead of the header, enabling static rendering.
 
-  //setRequestLocale(locale);
+  setRequestLocale(locale);
+
+  // Await the async server client creation
+  const supabase = await createClient();
+
+  const { data: userData } = await supabase.auth.getUser();
+  const user = userData?.user;
   const t = await getTranslations('MainPage');
 
   return (
-    <>
-      <h1>{t('title')}</h1>
-    </>
+    <div className='container flex flex-col items-center justify-center py-10'>
+      {user ? (
+        // Authenticated user
+        <h1 className='text-3xl font-bold'>
+          {t('welcomeBack', { name: user.user_metadata?.name || 'User' })}
+        </h1>
+      ) : (
+        // Unauthenticated user
+        <div className='flex flex-col items-center gap-4'>
+          <h1 className='text-3xl font-bold'>{t('title')}</h1>
+          <div className='flex gap-4'>
+            <Button asChild>
+              <Link href={signInPath()}>{t('signIn')}</Link>
+            </Button>
+            <Button asChild variant='secondary'>
+              <Link href={signUpPath()}>{t('signUp')}</Link>
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
