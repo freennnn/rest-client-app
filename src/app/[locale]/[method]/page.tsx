@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import RequestForm from '@/components/RequestForm';
 import ResponseDisplay from '@/components/ResponseDisplay';
 import { useCodeGenerator } from '@/hooks/useCodeGenerator';
+import { nonFoundPath } from '@/paths';
 import { Header, ResponseData } from '@/types/types';
 import { sendRequest } from '@/utils/rest-client/httpClient';
 import {
@@ -16,6 +17,7 @@ import {
   encodeRequestUrl,
 } from '@/utils/rest-client/urlEncoder';
 import { hasVariables } from '@/utils/variables/variableSubstitution';
+import { redirect } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 
 type RestClientPageProps = {
@@ -40,6 +42,12 @@ export default function RestClientPage({
   const [usingVariables, setUsingVariables] = useState(false);
 
   const searchParams = useSearchParams();
+
+  const isValidMethod = checkMethodValidity(method);
+
+  if (!isValidMethod) {
+    redirect(nonFoundPath());
+  }
 
   useEffect(() => {
     const checkForVariables = () => {
@@ -202,4 +210,8 @@ export default function RestClientPage({
       <ResponseDisplay responseData={responseData} error={error} />
     </div>
   );
+}
+
+function checkMethodValidity(method: string): boolean {
+  return ['GET', 'POST', 'PUT', 'DELETE'].includes(method.toUpperCase());
 }
