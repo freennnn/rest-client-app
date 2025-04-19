@@ -20,7 +20,7 @@ export function encodeSegment(segment: string): string {
 export function decodeSegment(encodedSegment: string): string {
   try {
     // Restore standard Base64 characters: replace - with +, _ with /
-    let base64 = encodedSegment.replace(/-/g, '+').replace(/_/g, '/');
+    const base64 = encodedSegment.replace(/-/g, '+').replace(/_/g, '/');
     // Add padding if necessary (though Buffer/atob might not strictly need it)
     // while (base64.length % 4) {
     //   base64 += '=';
