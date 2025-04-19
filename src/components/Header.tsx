@@ -34,6 +34,7 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const [isLocaleLoading, setIsLocaleLoading] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const currentLocale = useLocale();
 
   console.log('[Header] Rendering, currentLocale from useLocale():', currentLocale);
@@ -63,17 +64,34 @@ export function Header() {
     }
   }, [currentLocale, isLocaleLoading]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const isLoading = isAuthLoading || isLocaleLoading;
 
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
-        'transition-all duration-200 ease-in-out',
-        'hover:bg-background/100'
+        'sticky top-0 z-50 w-full border-b transition-all duration-300 ease-in-out',
+        isScrolled
+          ? 'bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-sm'
+          : 'bg-background'
       )}
     >
-      <div className='container flex h-14 items-center'>
+      <div
+        className={cn(
+          'container flex items-center transition-all duration-300 ease-in-out',
+          isScrolled ? 'h-14' : 'h-16'
+        )}
+      >
         <div className='mr-4 hidden pl-4 md:flex'>
           <Link href={homePath()} className='mr-6 flex items-center space-x-2'>
             <span className='hidden font-bold sm:inline-block'>{t('title')}</span>
