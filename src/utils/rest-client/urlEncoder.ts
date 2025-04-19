@@ -1,7 +1,15 @@
 // Generic function for encoding URL or Body path segments
 export function encodeSegment(segment: string): string {
   try {
-    return btoa(encodeURIComponent(segment));
+    // Standard URI encoding first
+    const uriSafe = encodeURIComponent(segment);
+    // Base64 encode, choosing implementation based on environment
+    const base64 =
+      typeof globalThis.btoa === 'function'
+        ? globalThis.btoa(uriSafe) // Browser
+        : Buffer.from(uriSafe, 'utf8').toString('base64'); // Node/Edge
+    // Convert to URL-safe Base64: replace + with -, / with _, remove padding =
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   } catch (error) {
     console.error('Error encoding segment:', error);
     throw new Error('Failed to encode segment');
@@ -11,19 +19,25 @@ export function encodeSegment(segment: string): string {
 // Generic function for decoding URL or Body path segments
 export function decodeSegment(encodedSegment: string): string {
   try {
-    // Basic check for Base64 format
-    const isValidBase64 = /^[A-Za-z0-9+/]*={0,2}$/.test(encodedSegment);
-    if (!isValidBase64) {
-      console.warn('Invalid base64 string encountered in segment:', encodedSegment);
-      // Return the original string if it doesn't look like Base64
-      return encodedSegment;
-    }
+    // Restore standard Base64 characters: replace - with +, _ with /
+    let base64 = encodedSegment.replace(/-/g, '+').replace(/_/g, '/');
+    // Add padding if necessary (though Buffer/atob might not strictly need it)
+    // while (base64.length % 4) {
+    //   base64 += '=';
+    // }
 
-    return decodeURIComponent(atob(encodedSegment));
+    // Decode Base64 based on environment
+    const decodedUriSafe =
+      typeof globalThis.atob === 'function'
+        ? globalThis.atob(base64) // Browser
+        : Buffer.from(base64, 'base64').toString('utf8'); // Node/Edge
+
+    // Decode URI components
+    return decodeURIComponent(decodedUriSafe);
   } catch (error) {
-    // Handle potential errors during atob or decodeURIComponent
-    console.error('Error decoding segment:', error);
-    // Return the original encoded string in case of error
+    // Handle potential errors during Base64 or URI decoding
+    console.error('Error decoding segment:', encodedSegment, error);
+    // Return the original encoded string in case of error as a fallback
     return encodedSegment;
   }
 }

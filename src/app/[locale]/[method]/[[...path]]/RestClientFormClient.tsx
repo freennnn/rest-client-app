@@ -38,7 +38,7 @@ export default function RestClientFormClient({
   const [requestBody, setRequestBody] = useState(initialBody);
   const [headers, setHeaders] = useState<Header[]>(initialHeaders);
   const [responseData, setResponseData] = useState<ResponseData | null>(null);
-  const [contentType, setContentType] = useState('application/json'); // Default or derive from headers?
+  const [contentType, setContentType] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [usingVariables, setUsingVariables] = useState(false);
@@ -91,7 +91,11 @@ export default function RestClientFormClient({
       setResponseData(null); // Clear previous response
 
       try {
-        const response = await sendRequest(url, method, headers, contentType, requestBody);
+        // Determine effective content type based on method
+        const effectiveCt = ['POST', 'PUT', 'PATCH'].includes(method) ? contentType : ''; // Use empty string if no body expected
+
+        // Pass effectiveCt to sendRequest
+        const response = await sendRequest(url, method, headers, effectiveCt, requestBody);
         setResponseData(response);
 
         // Update URL in browser history using encodeSegment
