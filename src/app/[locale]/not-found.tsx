@@ -2,10 +2,23 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { homePath } from '@/paths';
 import type { Metadata } from 'next';
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations, setRequestLocale } from 'next-intl/server';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale();
+// Define the resolved params structure (locale might be optional now)
+type ResolvedParams = {
+  locale?: string; // Make locale optional
+};
+
+export async function generateMetadata({
+  params: paramsPromise,
+}: {
+  params: Promise<ResolvedParams>;
+}): Promise<Metadata> {
+  const params = await paramsPromise;
+  // Get locale from params or fallback to getLocale()
+  const locale = params?.locale ?? (await getLocale());
+
+  setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'NotFoundPage' });
 
   return {
@@ -13,9 +26,17 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function NotFoundPage() {
-  const locale = await getLocale();
+export default async function NotFoundPage({
+  params: paramsPromise,
+}: {
+  params: Promise<ResolvedParams>;
+}) {
+  const params = await paramsPromise;
+  // Get locale from params or fallback to getLocale()
+  const locale = params?.locale ?? (await getLocale());
 
+  setRequestLocale(locale);
+  // Use the determined locale
   const t = await getTranslations({ locale, namespace: 'NotFoundPage' });
 
   return (

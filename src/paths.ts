@@ -8,10 +8,10 @@ export const confirmEmailPath = (email: string) =>
   pathWithEmail(`/auth/signup/confirm-email`, email);
 export const errorPath = () => '/error';
 
-export const restClientPath = () => '/rest';
+export const restClientPath = () => '/GET';
 export const variablesPath = () => '/variables';
 export const historyPath = () => '/history';
-
+export const nonFoundPath = () => '/404';
 export const isAuthenticatedPath = (pathname: string) => {
   return authenticatedPathesPrefix().some((prefix) => pathname.startsWith(prefix));
 };
