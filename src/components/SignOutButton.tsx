@@ -1,19 +1,26 @@
 'use client';
 
-import { signOut } from '@/actions/authActions';
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
-import { useTranslations } from 'next-intl';
+import { useAuthActions } from '@/hooks/useAuthActions';
 
 export function SignOutButton() {
-  const tAuth = useTranslations('auth');
+  const { signOut } = useAuthActions();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSignOut = async () => {
+    try {
+      setIsLoading(true);
+      await signOut();
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <Button
-      onClick={() => {
-        signOut();
-      }}
-    >
-      {tAuth('signOut')}
+    <Button variant='ghost' onClick={handleSignOut} disabled={isLoading}>
+      {isLoading ? 'Signing out...' : 'Sign out'}
     </Button>
   );
 }
