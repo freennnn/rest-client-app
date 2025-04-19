@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
-
 import { Button } from '@/components/ui/button';
 import { useRouter } from '@/i18n/navigation';
 import { homePath } from '@/paths';
@@ -10,10 +8,6 @@ import { useTranslations } from 'next-intl';
 export default function ErrorComponent({ error }: { error: Error & { digest?: string } }) {
   const t = useTranslations('ErrorPage');
   const router = useRouter();
-
-  useEffect(() => {
-    // Log the error to an error reporting service
-  }, [error]);
 
   return (
     <div className='flex flex-col items-center justify-center flex-1 px-4 py-12 text-center'>
