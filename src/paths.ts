@@ -1,5 +1,15 @@
 export const homePath = () => '/';
-export const authenticatedPathesPrefix = () => ['/rest', '/variables', '/history'];
+export const authenticatedPathesPrefix = () => [
+  '/GET',
+  '/POST',
+  '/PUT',
+  '/PATCH',
+  '/DELETE',
+  '/OPTIONS',
+  '/HEAD',
+  '/variables',
+  '/history',
+];
 export const signInPath = (email?: string) => {
   return pathWithEmail('/auth/signin', email);
 };
@@ -8,10 +18,10 @@ export const confirmEmailPath = (email: string) =>
   pathWithEmail(`/auth/signup/confirm-email`, email);
 export const errorPath = () => '/error';
 
-export const restClientPath = () => '/rest';
+export const restClientPath = () => '/GET';
 export const variablesPath = () => '/variables';
 export const historyPath = () => '/history';
-
+export const nonFoundPath = () => '/404';
 export const isAuthenticatedPath = (pathname: string) => {
   return authenticatedPathesPrefix().some((prefix) => pathname.startsWith(prefix));
 };
