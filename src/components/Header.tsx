@@ -74,7 +74,7 @@ export function Header() {
       )}
     >
       <div className='container flex h-14 items-center'>
-        <div className='mr-4 hidden md:flex'>
+        <div className='mr-4 hidden pl-4 md:flex'>
           <Link href={homePath()} className='mr-6 flex items-center space-x-2'>
             <span className='hidden font-bold sm:inline-block'>{t('title')}</span>
           </Link>
@@ -107,8 +107,8 @@ export function Header() {
             </nav>
           )}
         </div>
-        <div className='flex flex-1 items-center justify-between space-x-2 md:justify-end'>
-          <nav className='flex items-center'>
+        <div className='flex flex-1 items-center justify-end space-x-2'>
+          <nav className='ml-auto flex items-center'>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant='ghost' size='sm' disabled={isLoading}>
