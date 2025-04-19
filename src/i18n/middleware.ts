@@ -19,8 +19,24 @@ export const withIntl: MiddlewareFactory = (next) => {
     if (INTL_IGNORE_PATHS.some((path) => pathname.startsWith(path))) {
       return next(request, event);
     }
+
+    // Log request details BEFORE calling intlMiddleware
+    // console.log(`[withIntl] Pathname: ${pathname}`);
+    // console.log(`[withIntl] Accept-Language header: ${request.headers.get('accept-language')}`);
+    // console.log(`[withIntl] NEXT_LOCALE cookie: ${request.cookies.get('NEXT_LOCALE')?.value}`);
+
     // 1. Run standard next-intl middleware logic
     const intlResponse = intlMiddleware(request);
+
+    // Log the locale detected by intlMiddleware (if available in headers/response)
+    // Note: The actual negotiated locale used internally might not be directly exposed here easily.
+    // We rely on the getRequestConfig logs for that.
+    // console.log(`[withIntl] intlResponse status: ${intlResponse.status}`);
+    // console.log(
+    //   `[withIntl] intlResponse rewrite header: ${intlResponse.headers.get('x-middleware-rewrite')}`
+    // );
+    // console.log(`[withIntl] intlResponse location header: ${intlResponse.headers.get('location')}`);
+
     // 2. Check for next-intl redirect (then return immediately, no need
     //   to run the rest of the middleware stack and proceed with the request,
     //   a new one will be scheduled)

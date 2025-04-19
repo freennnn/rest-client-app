@@ -32,7 +32,7 @@ export default async function IndexPage({ params }: Props) {
   // can now read from this value instead of the header, enabling static rendering.
 
   //setRequestLocale(locale);
-  const t = await getTranslations({ locale, namespace: 'MainPage' });
+  const t = await getTranslations('MainPage');
 
   return (
     <>

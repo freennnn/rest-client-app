@@ -3,6 +3,7 @@ import { Footer } from '@/features/footer/footer';
 import { cn } from '@/lib/utils';
 import { AuthenticationProvider } from '@/providers/AuthenticationProvider';
 import { Locale, NextIntlClientProvider } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 
@@ -19,6 +20,8 @@ export default async function LocaleLayout({
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
+
+  setRequestLocale(locale);
 
   return (
     <html lang={locale} suppressHydrationWarning>
