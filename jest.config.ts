@@ -32,7 +32,11 @@ const config: Config = {
     '!src/**/*.d.ts',
     '!src/**/index.ts',
     '!src/@types/**',
-    '!src/utils/supabase/**',
+    '!src/utils/supabase/**', // Supabase third party code
+    '!src/i18n/**', // next-intl third party code
+    '!src/utils/middleware/**', // middleware Next.js code
+    '!src/middleware.ts', // middleware Next.js code
+
   ],
 };
 
