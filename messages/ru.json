@@ -215,5 +215,20 @@
     "usageUrl": "URL:",
     "usageHeaders": "Заголовках:",
     "usageBody": "Теле запроса:"
+  },
+  "HistoryPage": {
+    "title": "История запросов",
+    "description": "Просматривайте свои предыдущие запросы API и легко восстанавливайте их",
+    "loadingFallback": "Загрузка истории запросов..."
+  },
+  "HistoryViewer": {
+    "emptyTitle": "Вы еще не выполняли никаких запросов",
+    "emptyDescription": "Здесь пусто. Попробуйте:",
+    "restClientButton": "REST Клиент",
+    "clearConfirmationPrompt": "Вы уверены? Это действие нельзя отменить.",
+    "clearConfirmationYes": "Да, очистить все",
+    "clearConfirmationCancel": "Отмена",
+    "clearButton": "Очистить историю",
+    "headersLabel": "Заголовки:"
   }
 }

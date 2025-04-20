@@ -192,5 +192,20 @@
     "usageUrl": "URLs:",
     "usageHeaders": "Headers:",
     "usageBody": "Request Body:"
+  },
+  "HistoryPage": {
+    "title": "Request History",
+    "description": "View your previous API requests and easily restore them",
+    "loadingFallback": "Loading request history..."
+  },
+  "HistoryViewer": {
+    "emptyTitle": "You haven't executed any requests yet",
+    "emptyDescription": "It's empty here. Try:",
+    "restClientButton": "REST Client",
+    "clearConfirmationPrompt": "Are you sure? This cannot be undone.",
+    "clearConfirmationYes": "Yes, clear all",
+    "clearConfirmationCancel": "Cancel",
+    "clearButton": "Clear History",
+    "headersLabel": "Headers:"
   }
 }
