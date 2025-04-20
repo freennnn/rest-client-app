@@ -8,7 +8,7 @@ import { createClient } from '@/utils/supabase/client';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
-interface ActionResult {
+export interface ActionResult {
   success: boolean;
   error?: {
     message: string;
@@ -73,6 +73,10 @@ export function useAuthActions() {
           description: t('userAlreadyExistDescription'),
         });
         router.push(signInPath(email));
+        return {
+          success: false,
+          error: { message: 'User already exists', translatedMessage: t('userAlreadyExistTitle') },
+        };
       }
       const { error } = await supabase.auth.signUp({
         email,
