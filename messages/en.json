@@ -134,5 +134,38 @@
     "description": "An unexpected error occurred.",
     "tryAgain": "Try again",
     "backToHome": "Go back home"
+  },
+  "RestClientPage": {
+    "title": "RESTful Client",
+    "variablesNotification": "This request uses variables that will be substituted when sent."
+  },
+  "RequestForm": {
+    "headersLabel": "Headers",
+    "addHeaderButton": "Add Header",
+    "keyPlaceholder": "Key",
+    "valuePlaceholder": "Value",
+    "removeButton": "Remove",
+    "noHeaders": "No headers added",
+    "codeLabel": "Code",
+    "generatingCode": "Generating code...",
+    "bodyLabel": "Body",
+    "prettifyButton": "Prettify",
+    "bodyPlaceholderText": "Enter request body...",
+    "sendButton": "Send",
+    "sendingButton": "Sending..."
+  },
+  "ResponseDisplay": {
+    "title": "Response",
+    "statusLabel": "Status:",
+    "timeLabel": "Time:",
+    "sizeLabel": "Size:",
+    "noResponsePlaceholder": "Response will appear here after sending a request"
+  },
+  "CodeGenerator": {
+    "enterUrl": "Please enter a URL to generate code",
+    "error": "Error generating code. Please try again."
+  },
+  "Notifications": {
+    "networkErrorPrefix": "Network Request Failed: "
   }
 }
