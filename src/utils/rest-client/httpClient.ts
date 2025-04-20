@@ -40,22 +40,26 @@ export async function sendRequest(
     const duration = endTime - startTime;
 
     const contentTypeHeader = response.headers.get('Content-Type') || '';
-    let responseBody: string;
-    let parsedBody: unknown;
+    let responseBody = '';
+    let parsedBody: unknown = null;
 
-    if (contentTypeHeader.includes('application/json')) {
-      responseBody = await response.text();
-      try {
-        parsedBody = JSON.parse(responseBody);
-      } catch {
+    const hasBody = response.status !== 204 && response.status !== 304;
+
+    if (hasBody) {
+      const textBody = await response.text();
+      responseBody = textBody;
+
+      if (contentTypeHeader.includes('application/json')) {
+        try {
+          parsedBody = JSON.parse(responseBody);
+        } catch {
+          parsedBody = null;
+        }
+      } else if (!contentTypeHeader || contentTypeHeader.includes('text/')) {
+        parsedBody = null;
+      } else {
         parsedBody = null;
       }
-    } else if (contentTypeHeader.includes('text/')) {
-      responseBody = await response.text();
-      parsedBody = null;
-    } else {
-      responseBody = '[Binary data not displayed]';
-      parsedBody = null;
     }
 
     const responseHeaders: Record<string, string> = {};

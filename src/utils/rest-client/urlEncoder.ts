@@ -1,31 +1,22 @@
 export function encodeSegment(segment: string): string {
   try {
-    const uriSafe = encodeURIComponent(segment);
-
-    const base64 =
-      typeof globalThis.btoa === 'function'
-        ? globalThis.btoa(uriSafe) // Browser
-        : Buffer.from(uriSafe, 'utf8').toString('base64'); // Node/Edge
-    // Convert to URL-safe Base64: replace + with -, / with _, remove padding =
-    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    // Directly return the URL-encoded string
+    return encodeURIComponent(segment);
   } catch {
+    // It's very unlikely encodeURIComponent will throw for a string,
+    // but keep error handling just in case.
+    // Consider returning the original segment or an empty string if encoding fails?
     throw new Error('Failed to encode segment');
   }
 }
 
 export function decodeSegment(encodedSegment: string): string {
   try {
-    // Restore standard Base64 characters: replace - with +, _ with /
-    const base64 = encodedSegment.replace(/-/g, '+').replace(/_/g, '/');
-
-    const decodedUriSafe =
-      typeof globalThis.atob === 'function'
-        ? globalThis.atob(base64) // Browser
-        : Buffer.from(base64, 'base64').toString('utf8'); // Node/Edge
-
-    return decodeURIComponent(decodedUriSafe);
+    // Simply decode the URL-encoded string
+    return decodeURIComponent(encodedSegment);
   } catch {
-    return encodedSegment;
+    // If decoding fails, it might not be a valid encoded string
+    return encodedSegment; // Return original as fallback
   }
 }
 
