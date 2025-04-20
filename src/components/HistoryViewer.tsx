@@ -8,6 +8,8 @@ import { Link, useRouter } from '@/i18n/navigation';
 import { restClientPath } from '@/paths';
 import { Header, Method } from '@/types/types';
 import { encodeSegment } from '@/utils/rest-client/urlEncoder';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 export interface HistoryRecord {
   id: string;
@@ -25,6 +27,8 @@ export default function HistoryViewer() {
   const [isLoading, setIsLoading] = useState(true);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const router = useRouter();
+  const t = useTranslations('HistoryViewer');
+  const tNotify = useTranslations('Notifications');
 
   useEffect(() => {
     try {
@@ -33,12 +37,12 @@ export default function HistoryViewer() {
         const parsedHistory = JSON.parse(savedHistory) as HistoryRecord[];
         setHistory(parsedHistory.sort((a, b) => b.timestamp - a.timestamp));
       }
-    } catch (error) {
-      console.error('Failed to parse history from localStorage:', error);
+    } catch {
+      toast.error(tNotify('loadHistoryError'));
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [tNotify]);
 
   const openRequest = (request: HistoryRecord) => {
     try {
@@ -69,8 +73,8 @@ export default function HistoryViewer() {
       }
 
       router.push(targetPath);
-    } catch (error) {
-      console.error('Failed to construct or navigate to history item path:', error);
+    } catch {
+      toast.error(tNotify('createHistoryLinkError'));
     }
   };
 
@@ -87,10 +91,10 @@ export default function HistoryViewer() {
   if (!isLoading && history.length === 0) {
     return (
       <div className='flex flex-col items-center justify-center h-64 text-center'>
-        <h2 className='text-xl font-semibold mb-2'>You haven&apos;t executed any requests yet</h2>
-        <p className='text-gray-500 dark:text-gray-400 mb-6'>It&apos;s empty here. Try:</p>
+        <h2 className='text-xl font-semibold mb-2'>{t('emptyTitle')}</h2>
+        <p className='text-gray-500 dark:text-gray-400 mb-6'>{t('emptyDescription')}</p>
         <Button asChild>
-          <Link href={restClientPath()}>REST Client</Link>
+          <Link href={restClientPath()}>{t('restClientButton')}</Link>
         </Button>
       </div>
     );
@@ -102,7 +106,7 @@ export default function HistoryViewer() {
         {showConfirmation ? (
           <div className='flex items-center gap-2'>
             <span className='text-sm text-red-600 dark:text-red-400'>
-              Are you sure? This cannot be undone.
+              {t('clearConfirmationPrompt')}
             </span>
             <Button
               variant='destructive'
@@ -110,10 +114,10 @@ export default function HistoryViewer() {
               onClick={clearHistory}
               className='bg-red-600 hover:bg-red-700 text-white'
             >
-              Yes, clear all
+              {t('clearConfirmationYes')}
             </Button>
             <Button variant='outline' size='sm' onClick={() => setShowConfirmation(false)}>
-              Cancel
+              {t('clearConfirmationCancel')}
             </Button>
           </div>
         ) : (
@@ -123,7 +127,7 @@ export default function HistoryViewer() {
             onClick={() => setShowConfirmation(true)}
             className='text-red-500 border-red-300 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950'
           >
-            Clear History
+            {t('clearButton')}
           </Button>
         )}
       </div>
@@ -161,7 +165,9 @@ export default function HistoryViewer() {
               </div>
 
               {request.headers && request.headers.length > 0 && (
-                <p className='text-xs text-gray-500 mt-1'>Headers: {request.headers.length}</p>
+                <p className='text-xs text-gray-500 mt-1'>
+                  {t('headersLabel')} {request.headers.length}
+                </p>
               )}
 
               {request.body && (

@@ -8,12 +8,12 @@ import { createClient } from '@/utils/supabase/client';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
-interface ActionResult {
+export interface ActionResult {
   success: boolean;
   error?: {
-    message: string; // Raw error message from Supabase/catch
-    translatedMessage: string; // Translated message for toast/UI
-    code?: string; // Supabase error code if available
+    message: string;
+    translatedMessage: string;
+    code?: string;
   };
 }
 
@@ -51,7 +51,7 @@ export function useAuthActions() {
     } catch {
       const errorMessage = t('signInFailedGeneric');
       toast.error(errorMessage);
-      // Return a generic message for the form
+
       return { success: false, error: { message: errorMessage, translatedMessage: errorMessage } };
     } finally {
       setIsPending(false);
@@ -73,6 +73,10 @@ export function useAuthActions() {
           description: t('userAlreadyExistDescription'),
         });
         router.push(signInPath(email));
+        return {
+          success: false,
+          error: { message: 'User already exists', translatedMessage: t('userAlreadyExistTitle') },
+        };
       }
       const { error } = await supabase.auth.signUp({
         email,

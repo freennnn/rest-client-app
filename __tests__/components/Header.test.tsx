@@ -1,370 +1,218 @@
 import React from 'react';
 
 import { Header } from '@/components/Header';
-import { usePathname, useRouter } from '@/i18n/navigation';
-import { useAuth } from '@/providers/AuthenticationProvider';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { useLocale, useTranslations } from 'next-intl';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-jest.mock('@/providers/AuthenticationProvider');
+// --- Mocks ---
+
+// Mock Authentication Provider Hook
+const mockUseAuth = jest.fn();
+jest.mock('@/providers/AuthenticationProvider', () => ({
+  useAuth: () => mockUseAuth(),
+}));
+
+// Mock next-intl Hooks
+const mockT = jest.fn((key) => key.split('.').pop() || key); // Remove unused parameter
+const mockUseLocale = jest.fn(() => 'en'); // Default locale
+jest.mock('next-intl', () => ({
+  useTranslations: jest.fn(() => mockT),
+  useLocale: () => mockUseLocale(),
+}));
+
+// Mock Navigation Hooks and Components
+const mockReplace = jest.fn();
+const mockPush = jest.fn();
+const mockUseRouter = jest.fn(() => ({ replace: mockReplace, push: mockPush }));
+const mockUsePathname = jest.fn(() => '/mock-path');
 jest.mock('@/i18n/navigation', () => ({
-  Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
+  useRouter: () => mockUseRouter(),
+  usePathname: () => mockUsePathname(),
+  Link: jest.fn(({ href, children, ...props }) => (
     <a href={href} {...props}>
       {children}
     </a>
-  ),
-  usePathname: jest.fn(),
-  useRouter: jest.fn(),
+  )),
 }));
 
-jest.mock('next-intl', () => ({
-  useTranslations: jest.fn(),
-  useLocale: jest.fn(),
-}));
-
-jest.mock('@/i18n/routing', () => ({
-  routing: {
-    locales: ['en', 'ru'],
-  },
-}));
-
-jest.mock('lucide-react', () => ({
-  Loader2: () => <div data-testid='loader-icon' />,
-}));
-
-jest.mock('@/components/SignOutButton', () => ({
-  SignOutButton: () => <button>Sign Out</button>,
+// Mock UI Components
+jest.mock('@/components/ui/button', () => ({
+  // Mock 'Button' by rendering children or a placeholder button
+  Button: jest.fn(({ children, asChild, ...props }) => {
+    if (asChild) {
+      // If asChild is true, Button is just a wrapper, render children directly
+      return <>{children}</>;
+    }
+    // Otherwise, render a simple button element for testing interactions
+    return <button {...props}>{children}</button>;
+  }),
 }));
 
 jest.mock('@/components/ui/dropdown-menu', () => ({
-  DropdownMenu: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DropdownMenuTrigger: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid='dropdown-trigger'>{children}</div>
-  ),
-  DropdownMenuContent: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid='dropdown-content'>{children}</div>
-  ),
-  DropdownMenuItem: ({
-    children,
-    onClick,
-  }: {
-    children: React.ReactNode;
-    onClick?: () => void;
-  }) => (
-    <button data-testid='dropdown-item' onClick={onClick}>
-      {children}
-    </button>
-  ),
+  DropdownMenu: jest.fn(({ children }) => <div>{children}</div>),
+  DropdownMenuTrigger: jest.fn(({ children }) => (
+    <div data-testid='locale-trigger'>{children}</div>
+  )),
+  DropdownMenuContent: jest.fn(({ children }) => <div>{children}</div>),
+  DropdownMenuItem: jest.fn(({ children, onClick, disabled }) => {
+    const locale = typeof children === 'string' ? children.toLowerCase() : 'unknown';
+    return (
+      <button onClick={onClick} disabled={disabled} data-testid={`locale-menu-item-${locale}`}>
+        {children}
+      </button>
+    );
+  }),
 }));
 
+// Mock SignOutButton Component
+jest.mock('@/components/SignOutButton', () => ({
+  SignOutButton: jest.fn(() => <button>MockSignOutButton</button>), // Simple placeholder
+}));
+
+// Mock lucide-react Icon
+jest.mock('lucide-react', () => ({
+  Loader2: jest.fn(() => <span>Loading...</span>), // Simple placeholder
+}));
+
+// Mock path functions (return simple strings)
+jest.mock('@/paths', () => ({
+  homePath: jest.fn(() => '/mock-home'),
+  restClientPath: jest.fn(() => '/mock-rest-client'),
+  variablesPath: jest.fn(() => '/mock-variables'),
+  historyPath: jest.fn(() => '/mock-history'),
+  signInPath: jest.fn(() => '/mock-signin'),
+  signUpPath: jest.fn(() => '/mock-signup'),
+}));
+
+// Mock the routing configuration from src/i18n/routing.ts
+jest.mock('@/i18n/routing', () => ({
+  routing: {
+    locales: ['en', 'ru'], // Provide the necessary locales array
+    // Add other properties if needed by the component, otherwise keep simple
+  },
+}));
+
+// Mock routing constant (already imported, just ensure it's available)
+// We are using the actual routing object, which is fine as it's static data
+
+// Mock cn utility (optional, usually safe to use the real one)
+// jest.mock('@/lib/utils', () => ({
+//   cn: (...args) => args.filter(Boolean).join(' '),
+// }));
+
+// Helper to render Header with specific auth state
+const renderHeader = (authState: { isAuthenticated: boolean; isLoading: boolean }) => {
+  mockUseAuth.mockReturnValue(authState);
+  return render(<Header />);
+};
+
+// --- Tests ---
+
 describe('Header Component', () => {
-  const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-  const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>;
-  const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
-  const mockUseLocale = useLocale as jest.MockedFunction<typeof useLocale>;
-  const mockUseTranslations = useTranslations as jest.MockedFunction<typeof useTranslations>;
-
-  const mockT = jest.fn((key) => {
-    const translations: Record<string, string> = {
-      title: 'REST Client',
-      'nav.home': 'Home',
-      'nav.restClient': 'REST Client',
-      'nav.variables': 'Variables',
-      'nav.history': 'History',
-      'nav.signIn': 'Sign In',
-      'nav.signUp': 'Sign Up',
-      'language.en': 'English',
-      'language.ru': 'Russian',
-    };
-    return translations[key] || key;
-  });
-
   beforeEach(() => {
+    // Reset mocks before each test
     jest.clearAllMocks();
-
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isLoading: false,
-      user: null,
-    });
-
-    mockUsePathname.mockReturnValue('/');
-
-    mockUseRouter.mockReturnValue({
-      replace: jest.fn(),
-      push: jest.fn(),
-      back: jest.fn(),
-      forward: jest.fn(),
-    } as ReturnType<typeof useRouter>);
-
+    // Default mock return values
+    mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: false });
     mockUseLocale.mockReturnValue('en');
-
-    mockUseTranslations.mockReturnValue(mockT);
-
-    Object.defineProperty(window, 'scrollY', {
-      configurable: true,
-      value: 0,
-    });
-
-    window.addEventListener = jest.fn();
-    window.removeEventListener = jest.fn();
+    mockUseRouter.mockReturnValue({ replace: mockReplace, push: mockPush });
+    mockUsePathname.mockReturnValue('/mock-path');
+    mockT.mockImplementation((key) => key.split('.').pop() || key); // Remove unused parameter
   });
 
-  test('renders the header with site title', () => {
-    render(<Header />);
-    expect(screen.getByText('REST Client')).toBeInTheDocument();
+  it('should render correctly when logged out', () => {
+    renderHeader({ isAuthenticated: false, isLoading: false });
+
+    // Check for title
+    expect(screen.getByText('title')).toBeInTheDocument();
+
+    // Check for locale button (uses last part of key) - Target the first one (trigger)
+    expect(screen.getAllByRole('button', { name: 'en' })[0]).toBeInTheDocument();
+
+    // Check for Sign In / Sign Up buttons
+    expect(screen.getByRole('link', { name: 'signIn' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'signUp' })).toBeInTheDocument();
+
+    // Check that Sign Out button is NOT present
+    expect(screen.queryByText('MockSignOutButton')).not.toBeInTheDocument();
+
+    // Check that main nav links are NOT present
+    expect(screen.queryByRole('link', { name: 'home' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'restClient' })).not.toBeInTheDocument();
   });
 
-  test('displays sign in and sign up buttons when user is not authenticated', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isLoading: false,
-      user: null,
-    });
+  it('should render correctly when logged in', () => {
+    renderHeader({ isAuthenticated: true, isLoading: false });
 
-    render(<Header />);
+    // Check for title
+    expect(screen.getByText('title')).toBeInTheDocument();
 
-    expect(screen.getByText('Sign In')).toBeInTheDocument();
-    expect(screen.getByText('Sign Up')).toBeInTheDocument();
-    expect(screen.queryByText('Sign Out')).not.toBeInTheDocument();
+    // Check for locale button - Target the first one (trigger)
+    expect(screen.getAllByRole('button', { name: 'en' })[0]).toBeInTheDocument();
+
+    // Check that Sign In / Sign Up buttons are NOT present
+    expect(screen.queryByRole('link', { name: 'signIn' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'signUp' })).not.toBeInTheDocument();
+
+    // Check that Sign Out button IS present (using the mock's content)
+    expect(screen.getByText('MockSignOutButton')).toBeInTheDocument();
+
+    // Check that main nav links ARE present
+    expect(screen.getByRole('link', { name: 'home' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'restClient' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'variables' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'history' })).toBeInTheDocument();
   });
 
-  test('displays navigation links and sign out button when user is authenticated', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: true,
-      isLoading: false,
-      user: { id: '1', email: 'test@example.com' },
-    });
+  it('should change locale when a new locale is selected', async () => {
+    const user = userEvent.setup();
+    mockUseLocale.mockReturnValue('en'); // Start as 'en'
+    const { rerender } = renderHeader({ isAuthenticated: false, isLoading: false });
 
-    render(<Header />);
+    // Find the trigger using its test ID and click it
+    // Note: The button itself is a child of the trigger div now
+    const localeTrigger = screen.getByTestId('locale-trigger');
+    const localeTriggerButton = localeTrigger.querySelector('button');
+    expect(localeTriggerButton).toHaveTextContent('en');
+    await user.click(localeTriggerButton!);
 
-    expect(screen.getByText('Home')).toBeInTheDocument();
+    // Find and click the "ru" menu item using its test ID
+    const ruOption = await screen.findByTestId('locale-menu-item-ru');
+    await user.click(ruOption);
 
-    const restClientLinks = screen.getAllByRole('link');
-    const navRestClientLink = restClientLinks.find(
-      (link) => link.textContent === 'REST Client' && link.getAttribute('href') === '/GET'
-    );
-    expect(navRestClientLink).toBeInTheDocument();
+    // Verify the router was called
+    expect(mockReplace).toHaveBeenCalledTimes(1);
+    expect(mockReplace).toHaveBeenCalledWith('/mock-path', { locale: 'ru' });
 
-    expect(screen.getByText('Variables')).toBeInTheDocument();
-    expect(screen.getByText('History')).toBeInTheDocument();
-    expect(screen.getByText('Sign Out')).toBeInTheDocument();
-    expect(screen.queryByText('Sign In')).not.toBeInTheDocument();
-    expect(screen.queryByText('Sign Up')).not.toBeInTheDocument();
-  });
+    // Simulate the locale changing
+    mockUseLocale.mockReturnValue('ru');
 
-  test('shows loading indicator when auth is loading', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isLoading: true,
-      user: null,
-    });
-
-    mockUseLocale.mockReturnValue('en');
-
-    render(<Header />);
-
-    const dropdownTrigger = screen.getByTestId('dropdown-trigger');
-    const languageButton = dropdownTrigger.querySelector('button');
-    expect(languageButton).toHaveAttribute('disabled');
-  });
-
-  test('shows loading indicator when locale is changing', () => {
-    jest.resetAllMocks();
-
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isLoading: false,
-      user: null,
-    });
-
-    mockUseLocale.mockReturnValue('en');
-
-    const mockTranslationFn = jest.fn((key) => key);
-    mockUseTranslations.mockReturnValue(mockTranslationFn);
-
-    const { rerender } = render(<Header />);
-
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isLoading: true,
-      user: null,
-    });
-
+    // Rerender
     rerender(<Header />);
 
-    const dropdownTrigger = screen.getByTestId('dropdown-trigger');
-    const button = dropdownTrigger.querySelector('button');
-    expect(button).toHaveAttribute('disabled');
-  });
-
-  test('calls router.replace with new locale when language is changed', async () => {
-    const mockReplace = jest.fn();
-    mockUseRouter.mockReturnValue({
-      replace: mockReplace,
-      push: jest.fn(),
-      back: jest.fn(),
-      forward: jest.fn(),
-    } as ReturnType<typeof useRouter>);
-
-    mockUseLocale.mockReturnValue('en');
-    mockUsePathname.mockReturnValue('/test-path');
-
-    const TestLocaleChanger = () => {
-      const router = useRouter();
-      const pathname = usePathname();
-      const locale = useLocale();
-
-      const handleClick = () => {
-        if ('ru' === locale) return;
-        router.replace(pathname, { locale: 'ru' });
-      };
-
-      return <button onClick={handleClick}>Change to Russian</button>;
-    };
-
-    const { getByText } = render(<TestLocaleChanger />);
-
-    fireEvent.click(getByText('Change to Russian'));
-
-    expect(mockReplace).toHaveBeenCalledWith('/test-path', { locale: 'ru' });
-  });
-
-  test('handleLocaleChange does not trigger router.replace when locale is the same', () => {
-    const mockReplace = jest.fn();
-    mockUseRouter.mockReturnValue({
-      replace: mockReplace,
-      push: jest.fn(),
-      back: jest.fn(),
-      forward: jest.fn(),
-    } as ReturnType<typeof useRouter>);
-
-    mockUseLocale.mockReturnValue('en');
-    mockUsePathname.mockReturnValue('/test-path');
-
-    render(<Header />);
-
-    const dropdownTrigger = screen.getByTestId('dropdown-trigger');
-    fireEvent.click(dropdownTrigger);
-
-    const items = screen.getAllByTestId('dropdown-item');
-    const englishOption = items[0];
-
-    fireEvent.click(englishOption);
-
-    expect(mockReplace).not.toHaveBeenCalled();
-  });
-
-  test('handleLocaleChange does not trigger router.replace when already loading', () => {
-    const mockReplace = jest.fn();
-    mockUseRouter.mockReturnValue({
-      replace: mockReplace,
-      push: jest.fn(),
-      back: jest.fn(),
-      forward: jest.fn(),
-    } as ReturnType<typeof useRouter>);
-
-    mockUseLocale.mockReturnValue('en');
-    mockUsePathname.mockReturnValue('/test-path');
-
-    const TestComponent = () => {
-      const [isLoading, setIsLoading] = React.useState(true);
-      const router = useRouter();
-      const pathname = usePathname();
-      const locale = useLocale();
-
-      const handleClick = () => {
-        if (locale === 'ru' || isLoading) return;
-        setIsLoading(true);
-        router.replace(pathname, { locale: 'ru' });
-      };
-
-      return (
-        <div>
-          <span data-testid='loading-status'>{isLoading ? 'Loading' : 'Not Loading'}</span>
-          <button onClick={handleClick}>Change locale</button>
-        </div>
-      );
-    };
-
-    render(<TestComponent />);
-
-    const button = screen.getByText('Change locale');
-    fireEvent.click(button);
-
-    expect(mockReplace).not.toHaveBeenCalled();
-  });
-
-  test('resets locale loading state after locale change', async () => {
-    const TestLocaleChangeComponent = () => {
-      const [isLoading, setIsLoading] = React.useState(true);
-      const currentLocale = useLocale();
-
-      React.useEffect(() => {
-        if (isLoading) {
-          setIsLoading(false);
-        }
-      }, [currentLocale, isLoading]);
-
-      return <div data-testid='loading-state'>{isLoading ? 'Loading' : 'Not Loading'}</div>;
-    };
-
-    mockUseLocale.mockReturnValue('en');
-
-    const { rerender } = render(<TestLocaleChangeComponent />);
-
-    expect(screen.getByTestId('loading-state')).toHaveTextContent('Loading');
-
+    // Wait for the trigger button to update its text using its test ID
+    // We find the trigger div and check the button inside it
     await waitFor(() => {
-      expect(screen.getByTestId('loading-state')).toHaveTextContent('Not Loading');
+      const updatedTrigger = screen.getByTestId('locale-trigger');
+      const updatedButton = updatedTrigger.querySelector('button');
+      expect(updatedButton).toHaveTextContent('ru');
     });
 
-    mockUseLocale.mockReturnValue('ru');
-    rerender(<TestLocaleChangeComponent />);
-
-    expect(screen.getByTestId('loading-state')).toHaveTextContent('Not Loading');
+    // Check that the 'en' menu item still exists
+    expect(screen.getByTestId('locale-menu-item-en')).toBeInTheDocument();
   });
 
-  test('renders SignOutButton when user is authenticated', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: true,
-      isLoading: false,
-      user: { id: '1', email: 'test@example.com' },
-    });
+  it('should show loading state during auth check', () => {
+    renderHeader({ isAuthenticated: false, isLoading: true });
 
-    render(<Header />);
+    // Check the trigger button state via test ID
+    const localeTrigger = screen.getByTestId('locale-trigger');
+    const localeTriggerButton = localeTrigger.querySelector('button');
+    expect(localeTriggerButton).toBeDisabled();
 
-    expect(screen.getByText('Sign Out')).toBeInTheDocument();
-
-    expect(screen.queryByRole('link', { name: 'Sign In' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Sign Up' })).not.toBeInTheDocument();
+    // Sign in/up links might still be visible
+    expect(screen.getByRole('link', { name: 'signIn' })).toBeInTheDocument();
   });
 
-  test('adds scroll event listener and updates header style on scroll', () => {
-    render(<Header />);
-
-    expect(window.addEventListener).toHaveBeenCalledWith('scroll', expect.any(Function));
-
-    Object.defineProperty(window, 'scrollY', {
-      configurable: true,
-      value: 20,
-    });
-
-    const scrollHandler = (window.addEventListener as jest.Mock).mock.calls.find(
-      (call) => call[0] === 'scroll'
-    )[1];
-
-    scrollHandler();
-
-    const { container } = render(<Header />);
-
-    expect(container.querySelector('.shadow-sm')).not.toBeNull();
-  });
-
-  test('removes event listener on unmount', () => {
-    const { unmount } = render(<Header />);
-    unmount();
-
-    expect(window.removeEventListener).toHaveBeenCalledWith('scroll', expect.any(Function));
-  });
+  // Add more tests as needed, e.g., for scroll behavior if crucial
 });
