@@ -57,8 +57,6 @@ export function Header() {
   };
 
   useEffect(() => {
-    // Optional: Log when effect runs
-    // console.log('[Header] useEffect running, isLocaleLoading:', isLocaleLoading, 'currentLocale:', currentLocale);
     if (isLocaleLoading) {
       setIsLocaleLoading(false);
     }

@@ -4,25 +4,20 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 const HistoryViewer = lazy(() => import('@/components/HistoryViewer'));
 
-// Define resolved params structure
 type ResolvedParams = {
   locale: string;
 };
 
-// Make the component async and accept params as Promise
 export default async function HistoryPage({
   params: paramsPromise,
 }: {
   params: Promise<ResolvedParams>;
 }) {
-  // Await the promise
   const params = await paramsPromise;
-  const locale = params.locale; // Get locale from resolved params
+  const locale = params.locale;
 
-  // Set locale context
   setRequestLocale(locale);
 
-  // Get translations for server-rendered text
   const t = await getTranslations('HistoryPage');
 
   return (

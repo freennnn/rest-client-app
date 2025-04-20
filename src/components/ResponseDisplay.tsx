@@ -1,9 +1,7 @@
 'use client';
 
-// Ensure client component
 import React from 'react';
 
-// Import useTranslations
 import { useTranslations } from 'next-intl';
 
 interface ResponseDisplayProps {
@@ -11,14 +9,13 @@ interface ResponseDisplayProps {
     status: number;
     statusText: string;
     body: string;
-    duration?: number; // Changed time to duration to match sendRequest return
-    size?: number; // Added size
+    duration?: number;
+    size?: number;
   } | null;
-  error: string | null; // Although we pass null now, keep prop for flexibility
+  error: string | null;
 }
 
 export default function ResponseDisplay({ responseData, error }: ResponseDisplayProps) {
-  // Initialize translation function
   const t = useTranslations('ResponseDisplay');
 
   return (

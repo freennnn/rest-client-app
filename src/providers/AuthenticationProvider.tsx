@@ -30,7 +30,6 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
   useEffect(() => {
     console.log('AuthProvider: Initializing auth state...');
 
-    // Get initial user state
     const initializeAuth = async () => {
       try {
         console.log('AuthProvider: Fetching initial session...');
@@ -60,7 +59,6 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
 
     initializeAuth();
 
-    // Listen for auth state changes
     console.log('AuthProvider: Setting up auth state change listener...');
     const {
       data: { subscription },
@@ -71,7 +69,6 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
         session ? 'session exists' : 'no session'
       );
 
-      // For sign out events, ensure we clear the state
       if (event === 'SIGNED_OUT') {
         console.log('AuthProvider: Handling sign out event');
         setUser(null);
@@ -79,7 +76,6 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
         return;
       }
 
-      // For other events, update based on session
       setUser(session?.user ?? null);
       setIsAuthenticated(!!session?.user);
     });

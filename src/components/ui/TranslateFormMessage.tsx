@@ -1,4 +1,3 @@
-// src/components/ui/TranslatedFormMessage.tsx
 import * as React from 'react';
 
 import { useFormField } from '@/components/ui/form';
@@ -6,8 +5,8 @@ import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 
 interface TranslatedFormMessageProps extends React.HTMLAttributes<HTMLParagraphElement> {
-  children?: string; // Translation key
-  namespace?: string; // Optional namespace for translations
+  children?: string;
+  namespace?: string;
 }
 
 export function TranslatedFormMessage({

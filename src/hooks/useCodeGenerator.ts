@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { CodeGenOptions } from '../types/types';
 
-const DEBOUNCE_DELAY = 500; // Debounce delay in milliseconds
+const DEBOUNCE_DELAY = 500;
 
 export function useCodeGenerator({ url, method, headers, contentType, body }: CodeGenOptions) {
   const [selectedLanguage, setSelectedLanguage] = useState('curl');

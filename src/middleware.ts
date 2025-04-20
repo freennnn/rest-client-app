@@ -7,7 +7,6 @@ const middlewares = [
   withSupabase, // Supabase runs second (calls next->Base, checks auth, modifies response)
 ];
 
-// This single function will be executed by Next.js for matched paths.
 export const middleware = stackMiddlewares(middlewares);
 
 // This should be the UNION of paths needed by ANY middleware,excluding only
