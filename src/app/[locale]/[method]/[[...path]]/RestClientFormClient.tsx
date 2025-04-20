@@ -2,15 +2,22 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import { HistoryRecord } from '@/components/HistoryViewer';
 // Keep using this for client-side updates if needed
 
 import RequestForm from '@/components/RequestForm';
 import ResponseDisplay from '@/components/ResponseDisplay';
 import { useCodeGenerator } from '@/hooks/useCodeGenerator';
-import { Header, ResponseData } from '@/types/types';
+import { Header, Method, ResponseData } from '@/types/types';
 import { sendRequest } from '@/utils/rest-client/httpClient';
 import { encodeSegment } from '@/utils/rest-client/urlEncoder';
-import { hasVariables } from '@/utils/variables/variableSubstitution';
+import {
+  hasVariables,
+  processBody,
+  processHeaders,
+  processUrl,
+} from '@/utils/variables/variableSubstitution';
+import { toast } from 'sonner';
 
 //import { useSearchParams } from 'next/navigation';
 
@@ -88,15 +95,71 @@ export default function RestClientFormClient({
       if (e) e.preventDefault();
       setLoading(true);
       setError(null);
-      setResponseData(null); // Clear previous response
+      setResponseData(null);
+
+      // Define saveToHistory INSIDE handleSubmit
+      const saveToHistory = (resolvedUrl?: string) => {
+        try {
+          const historyRecord: HistoryRecord = {
+            id: `req-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            url,
+            method: method as Method,
+            headers,
+            body: requestBody,
+            contentType,
+            timestamp: Date.now(),
+            resolvedUrl,
+          };
+          let history: HistoryRecord[] = [];
+          const savedHistory = localStorage.getItem('restClientHistory');
+          if (savedHistory) {
+            try {
+              history = JSON.parse(savedHistory);
+              if (!Array.isArray(history)) history = [];
+            } catch (e) {
+              console.error('Failed to parse history, resetting:', e);
+              history = [];
+            }
+          }
+          history.unshift(historyRecord);
+          const MAX_HISTORY_ITEMS = 50;
+          if (history.length > MAX_HISTORY_ITEMS) {
+            history = history.slice(0, MAX_HISTORY_ITEMS);
+          }
+          localStorage.setItem('restClientHistory', JSON.stringify(history));
+          console.log('Request saved to history');
+        } catch (err) {
+          console.error('Failed to save request to history:', err);
+        }
+      };
+      // End of saveToHistory definition
 
       try {
+        let processedUrl = url;
+        let processedHeaders = [...headers];
+        let processedBody = requestBody;
+
+        if (usingVariables) {
+          processedUrl = processUrl(url);
+          processedHeaders = processHeaders(headers);
+          processedBody = processBody(requestBody);
+        }
+
         // Determine effective content type based on method
         const effectiveCt = ['POST', 'PUT', 'PATCH'].includes(method) ? contentType : ''; // Use empty string if no body expected
 
         // Pass effectiveCt to sendRequest
-        const response = await sendRequest(url, method, headers, effectiveCt, requestBody);
+        const response = await sendRequest(
+          processedUrl, // Use processed values for the actual request
+          method,
+          processedHeaders,
+          effectiveCt,
+          processedBody
+        );
         setResponseData(response);
+
+        // Call the locally defined saveToHistory
+        saveToHistory(usingVariables ? processedUrl : undefined);
 
         // Update URL in browser history using encodeSegment
         let urlPath = `/${locale}/${method}`;
@@ -133,13 +196,17 @@ export default function RestClientFormClient({
           console.error('Error encoding URL/Body/Headers for history update:', encodingError);
         }
       } catch (err) {
-        setError(`Request failed: ${err instanceof Error ? err.message : String(err)}`);
-        // setResponseData(null); // Already cleared at start
+        // Network/fetch error: Show toast instead of setting local error state
+        console.error('Request failed:', err); // Log the full error for debugging
+        const message = err instanceof Error ? err.message : 'An unknown error occurred';
+        toast.error(`Network Request Failed: ${message}`);
+        // Do NOT set the local 'error' state here
+        // setError(`Request failed: ${message}`);
       } finally {
         setLoading(false);
       }
     },
-    [url, method, headers, contentType, requestBody, locale]
+    [url, method, headers, contentType, requestBody, locale, usingVariables]
   ); // Add locale to dependencies
 
   // --- Render UI ---
@@ -192,7 +259,7 @@ export default function RestClientFormClient({
         error={error}
       />
 
-      <ResponseDisplay responseData={responseData} error={error && !responseData ? error : null} />
+      <ResponseDisplay responseData={responseData} error={null} />
     </div>
   );
 }

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 
 import { CodeGenOptions } from '../types/types';
 
+const DEBOUNCE_DELAY = 500; // Debounce delay in milliseconds
+
 export function useCodeGenerator({ url, method, headers, contentType, body }: CodeGenOptions) {
   const [selectedLanguage, setSelectedLanguage] = useState('curl');
   const [generatedCode, setGeneratedCode] = useState('');
@@ -11,18 +13,19 @@ export function useCodeGenerator({ url, method, headers, contentType, body }: Co
     const generateCode = async () => {
       if (!url) {
         setGeneratedCode('Please enter a URL to generate code');
+        setIsLoading(false); // Ensure loading is false if no URL
         return;
       }
 
-      setIsLoading(true);
+      setIsLoading(true); // Set loading true when the actual fetch starts
 
       try {
         const headersList = headers
           .filter((h) => h.key.trim() !== '')
           .map((h) => ({ key: h.key, value: h.value }));
 
-        if ((method === 'POST' || method === 'PUT') && contentType) {
-          const contentTypeExists = headers.some((h) => h.key.toLowerCase() === 'content-type');
+        if ((method === 'POST' || method === 'PUT' || method === 'PATCH') && contentType) {
+          const contentTypeExists = headersList.some((h) => h.key.toLowerCase() === 'content-type');
           if (!contentTypeExists) {
             headersList.push({ key: 'Content-Type', value: contentType });
           }
@@ -40,7 +43,7 @@ export function useCodeGenerator({ url, method, headers, contentType, body }: Co
               method,
               header: headersList,
               body:
-                (method === 'POST' || method === 'PUT') && body
+                (method === 'POST' || method === 'PUT' || method === 'PATCH') && body
                   ? {
                       mode: contentType?.includes('json') ? 'raw' : 'text',
                       raw: body,
@@ -51,7 +54,8 @@ export function useCodeGenerator({ url, method, headers, contentType, body }: Co
         });
 
         if (!response.ok) {
-          throw new Error('Failed to generate code');
+          const errorText = await response.text(); // Try to get more error info
+          throw new Error(`Failed to generate code: ${response.status} ${errorText}`);
         }
 
         const data = await response.json();
@@ -60,12 +64,22 @@ export function useCodeGenerator({ url, method, headers, contentType, body }: Co
         console.error('Error generating code:', error);
         setGeneratedCode('Error generating code. Please try again.');
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // Set loading false when fetch completes or fails
       }
     };
 
-    generateCode();
-  }, [url, method, headers, body, contentType, selectedLanguage]);
+    // --- Debounce Logic ---
+    // Set a timeout to call generateCode after the delay
+    const timeoutId = setTimeout(() => {
+      generateCode();
+    }, DEBOUNCE_DELAY);
+
+    // Cleanup function: clear the timeout if dependencies change before delay is over
+    return () => {
+      clearTimeout(timeoutId);
+    };
+    // ---------------------
+  }, [url, method, headers, body, contentType, selectedLanguage]); // Dependencies remain the same
 
   return {
     selectedLanguage,

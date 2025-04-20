@@ -8,6 +8,8 @@ export interface ResponseData {
   size: number;
 }
 
+export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
+
 export type Header = {
   id: string;
   key: string;
