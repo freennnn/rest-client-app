@@ -15,9 +15,9 @@ const config: Config = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  // Tell Jest to transform next-intl
+  // Revert to the simpler pattern for transforming next-intl
   transformIgnorePatterns: [
-    '/node_modules/(?!(next-intl)/)', // Exclude next-intl from ignore pattern
+    '/node_modules/(?!(next-intl)/)',
   ],
   collectCoverage: true,
   collectCoverageFrom: [
