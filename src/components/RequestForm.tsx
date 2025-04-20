@@ -201,7 +201,7 @@ export default function RequestForm({
             </SelectContent>
           </Select>
         </div>
-        <pre className='border p-3 rounded bg-gray-100 dark:bg-gray-800 text-sm overflow-auto max-h-40 font-mono'>
+        <pre className='border p-3 rounded bg-gray-100 dark:bg-gray-800 text-sm overflow-auto max-h-40 min-h-40 font-mono'>
           {/* Translate generatedCode if it's a known key */}
           {codeLoading
             ? t('RequestForm.generatingCode')
