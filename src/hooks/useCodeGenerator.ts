@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { CodeGenOptions } from '../types/types';
 
-const DEBOUNCE_DELAY = 500; // Debounce delay in milliseconds
+const DEBOUNCE_DELAY = 500;
 
 export function useCodeGenerator({ url, method, headers, contentType, body }: CodeGenOptions) {
   const [selectedLanguage, setSelectedLanguage] = useState('curl');
@@ -60,8 +60,7 @@ export function useCodeGenerator({ url, method, headers, contentType, body }: Co
 
         const data = await response.json();
         setGeneratedCode(data.code);
-      } catch (error) {
-        console.error('Error generating code:', error);
+      } catch {
         setGeneratedCode('CodeGenerator.error');
       } finally {
         setIsLoading(false);

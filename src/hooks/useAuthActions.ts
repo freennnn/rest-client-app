@@ -11,9 +11,9 @@ import { toast } from 'sonner';
 interface ActionResult {
   success: boolean;
   error?: {
-    message: string; // Raw error message from Supabase/catch
-    translatedMessage: string; // Translated message for toast/UI
-    code?: string; // Supabase error code if available
+    message: string;
+    translatedMessage: string;
+    code?: string;
   };
 }
 
@@ -51,7 +51,7 @@ export function useAuthActions() {
     } catch {
       const errorMessage = t('signInFailedGeneric');
       toast.error(errorMessage);
-      // Return a generic message for the form
+
       return { success: false, error: { message: errorMessage, translatedMessage: errorMessage } };
     } finally {
       setIsPending(false);

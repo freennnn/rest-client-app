@@ -160,7 +160,9 @@
   },
   "RestClientPage": {
     "title": "REST-клиент",
-    "variablesNotification": "Этот запрос использует переменные, которые будут подставлены при отправке."
+    "variablesNotification": "Используются переменные! Финальные значения будут подставлены перед отправкой.",
+    "invalidJsonError": "Неверный формат JSON. Невозможно отформатировать.",
+    "unknownError": "Произошла неизвестная ошибка"
   },
   "RequestForm": {
     "headersLabel": "Заголовки",
@@ -189,7 +191,14 @@
     "error": "Ошибка генерации кода. Пожалуйста, попробуйте еще раз."
   },
   "Notifications": {
-    "networkErrorPrefix": "Сетевая ошибка: "
+    "networkErrorPrefix": "Сетевая ошибка: ",
+    "encodingErrorPrefix": "Ошибка кодирования URL: ",
+    "unknownError": "Произошла неизвестная ошибка",
+    "loadHistoryError": "Не удалось загрузить историю из хранилища.",
+    "createHistoryLinkError": "Не удалось создать ссылку для элемента истории.",
+    "authCheckError": "Не удалось проверить статус аутентификации.",
+    "loadVariablesError": "Не удалось загрузить переменные из локального хранилища.",
+    "invalidJsonError": "Неверный формат JSON. Невозможно отформатировать."
   },
   "VariablesPage": {
     "unauthenticatedMessage": "Пожалуйста, войдите, чтобы получить доступ к переменным.",

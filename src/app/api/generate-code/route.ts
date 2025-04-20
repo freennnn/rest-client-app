@@ -64,7 +64,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ code });
   } catch (error) {
-    console.error('Error generating code:', error);
-    return NextResponse.json({ error: 'Failed to generate code' }, { status: 500 });
+    throw error;
   }
 }

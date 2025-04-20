@@ -1,14 +1,10 @@
 'use client';
 
-// Ensure this component is a client component
 import React from 'react';
 
 import { Button } from '@/components/ui/button';
-// Assuming Button is used
 import { Input } from '@/components/ui/input';
-// Assuming Select is used
 import { Label } from '@/components/ui/label';
-// Assuming Textarea is used
 import {
   Select,
   SelectContent,
@@ -16,14 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-// Assuming Input is used
 import { Textarea } from '@/components/ui/textarea';
-// Import useTranslations
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 import { Header } from '../types/types';
-
-// Assuming Label is used
 
 interface RequestFormProps {
   url: string;
@@ -42,7 +35,7 @@ interface RequestFormProps {
   codeLoading: boolean;
   selectedCodeLanguage: string;
   setSelectedCodeLanguage: (language: string) => void;
-  error: string | null; // Keep error prop for potential validation errors
+  error: string | null;
 }
 
 export default function RequestForm({
@@ -64,9 +57,8 @@ export default function RequestForm({
   setSelectedCodeLanguage,
   error,
 }: RequestFormProps) {
-  // Initialize translation function
-  const t = useTranslations(); // Using default namespace
-  // Or const t = useTranslations('RequestForm');
+  const t = useTranslations();
+  const tNotify = useTranslations('Notifications');
 
   const addHeader = () => {
     const newId = `header-${Date.now()}`;
@@ -89,14 +81,12 @@ export default function RequestForm({
         const parsed = JSON.parse(requestBody);
         setRequestBody(JSON.stringify(parsed, null, 2));
       } catch (e) {
-        // Maybe show a toast here instead of console.error?
-        console.error('Invalid JSON format', e);
-        // Consider: toast.error(t('RequestForm.invalidJson')) - requires adding key
+        const message = e instanceof Error ? e.message : tNotify('invalidJsonError');
+        toast.error(message);
       }
     }
   };
 
-  // Function to check if generatedCode is a translation key
   const isTranslationKey = (code: string) => {
     return code.startsWith('CodeGenerator.');
   };
@@ -121,7 +111,7 @@ export default function RequestForm({
         </Select>
         <Input
           type='url'
-          placeholder='Enter endpoint URL' // Consider t('RequestForm.urlPlaceholder') ?
+          placeholder={t('RequestForm.urlPlaceholder')}
           className='flex-1'
           value={url}
           onChange={(e) => setUrl(e.target.value)}
@@ -250,7 +240,7 @@ export default function RequestForm({
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRequestBody(e.target.value)}
             placeholder={
               contentType.includes('json')
-                ? `{\n  "key": "value"\n}` // Keep JSON example as is
+                ? `{\n  "key": "value"\n}`
                 : t('RequestForm.bodyPlaceholderText')
             }
           />

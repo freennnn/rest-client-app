@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Base schemas with translation keys (relative to `auth` namespace)
 export const signInSchema = z.object({
   email: z.string().email({ message: 'auth.validation.emailInvalid' }),
   password: z
