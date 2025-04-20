@@ -142,6 +142,7 @@
     "unknownError": "An unknown error occurred"
   },
   "RequestForm": {
+    "urlPlaceholder": "Enter URL or use '{{variable}}'",
     "headersLabel": "Headers",
     "addHeaderButton": "Add Header",
     "keyPlaceholder": "Key",

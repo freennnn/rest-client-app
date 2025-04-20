@@ -165,6 +165,7 @@
     "unknownError": "Произошла неизвестная ошибка"
   },
   "RequestForm": {
+    "urlPlaceholder": "Введите URL или используйте '{{переменную}}'",
     "headersLabel": "Заголовки",
     "addHeaderButton": "Добавить заголовок",
     "keyPlaceholder": "Ключ",
