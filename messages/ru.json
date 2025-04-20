@@ -157,5 +157,91 @@
     "description": "Произошла непредвиденная ошибка.",
     "tryAgain": "Попробовать снова",
     "backToHome": "Вернуться на главную"
+  },
+  "RestClientPage": {
+    "title": "REST-клиент",
+    "variablesNotification": "Используются переменные! Финальные значения будут подставлены перед отправкой.",
+    "invalidJsonError": "Неверный формат JSON. Невозможно отформатировать.",
+    "unknownError": "Произошла неизвестная ошибка"
+  },
+  "RequestForm": {
+    "headersLabel": "Заголовки",
+    "addHeaderButton": "Добавить заголовок",
+    "keyPlaceholder": "Ключ",
+    "valuePlaceholder": "Значение",
+    "removeButton": "Удалить",
+    "noHeaders": "Заголовки не добавлены",
+    "codeLabel": "Код",
+    "generatingCode": "Генерация кода...",
+    "bodyLabel": "Тело запроса",
+    "prettifyButton": "Форматировать",
+    "bodyPlaceholderText": "Введите тело запроса...",
+    "sendButton": "Отправить",
+    "sendingButton": "Отправка..."
+  },
+  "ResponseDisplay": {
+    "title": "Ответ",
+    "statusLabel": "Статус:",
+    "timeLabel": "Время:",
+    "sizeLabel": "Размер:",
+    "noResponsePlaceholder": "Ответ появится здесь после отправки запроса"
+  },
+  "CodeGenerator": {
+    "enterUrl": "Пожалуйста, введите URL для генерации кода",
+    "error": "Ошибка генерации кода. Пожалуйста, попробуйте еще раз."
+  },
+  "Notifications": {
+    "networkErrorPrefix": "Сетевая ошибка: ",
+    "encodingErrorPrefix": "Ошибка кодирования URL: ",
+    "unknownError": "Произошла неизвестная ошибка",
+    "loadHistoryError": "Не удалось загрузить историю из хранилища.",
+    "createHistoryLinkError": "Не удалось создать ссылку для элемента истории.",
+    "authCheckError": "Не удалось проверить статус аутентификации.",
+    "loadVariablesError": "Не удалось загрузить переменные из локального хранилища.",
+    "invalidJsonError": "Неверный формат JSON. Невозможно отформатировать."
+  },
+  "VariablesPage": {
+    "unauthenticatedMessage": "Пожалуйста, войдите, чтобы получить доступ к переменным.",
+    "title": "Переменные REST-клиента",
+    "description": "Создавайте переменные для использования в запросах с синтаксисом '{{'variableName'}}'",
+    "loadingFallback": "Загрузка редактора переменных..."
+  },
+  "VariablesEditor": {
+    "statusSaving": "Сохранение изменений...",
+    "statusSaved": "Изменения успешно сохранены",
+    "statusError": "Ошибка сохранения изменений",
+    "yourVariablesTitle": "Ваши переменные",
+    "noVariablesPlaceholder": "Переменные еще не определены. Создайте одну ниже.",
+    "deleteButton": "Удалить",
+    "addNewTitle": "Добавить новую переменную",
+    "nameLabel": "Имя переменной",
+    "namePlaceholder": "API_KEY",
+    "valueLabel": "Значение",
+    "valuePlaceholder": "значение-вашего-api-ключа",
+    "addButton": "Добавить переменную",
+    "usageTitle": "Как использовать переменные",
+    "usageIntro": "Переменные можно использовать в:",
+    "usageUrl": "URL:",
+    "usageHeaders": "Заголовках:",
+    "usageBody": "Теле запроса:"
+  },
+  "HistoryPage": {
+    "title": "История запросов",
+    "description": "Просматривайте свои предыдущие запросы API и легко восстанавливайте их",
+    "loadingFallback": "Загрузка истории запросов..."
+  },
+  "HistoryViewer": {
+    "emptyTitle": "Вы еще не выполняли никаких запросов",
+    "emptyDescription": "Здесь пусто. Попробуйте:",
+    "restClientButton": "REST Клиент",
+    "clearConfirmationPrompt": "Вы уверены? Это действие нельзя отменить.",
+    "clearConfirmationYes": "Да, очистить все",
+    "clearConfirmationCancel": "Отмена",
+    "clearButton": "Очистить историю",
+    "headersLabel": "Заголовки:"
+  },
+  "Footer": {
+    "copyright": "© {year} REST Client",
+    "builtWith": "Создано с помощью Next.js и TailwindCSS"
   }
 }

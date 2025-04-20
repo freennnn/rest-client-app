@@ -27,7 +27,7 @@ export function substituteVariables(text: string): string {
 
   return text.replace(variableRegex, (match, variableName) => {
     const variable = variables.find((v) => v.name === variableName.trim());
-    return variable ? variable.value : match; // Return original if variable not found
+    return variable ? variable.value : match;
   });
 }
 

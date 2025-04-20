@@ -1,11 +1,21 @@
 import { SignInForm } from '@/components/SignInForm';
+import { homePath } from '@/paths';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
 export default async function SignInPage({
-  searchParams,
+  searchParams: searchParamsPromise,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const params = await searchParams;
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+
+  if (data.user) {
+    redirect(homePath());
+  }
+
+  const params = await searchParamsPromise;
   const email = typeof params.email === 'string' ? params.email : '';
 
   return (

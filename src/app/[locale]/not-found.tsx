@@ -4,9 +4,8 @@ import { homePath } from '@/paths';
 import type { Metadata } from 'next';
 import { getLocale, getTranslations, setRequestLocale } from 'next-intl/server';
 
-// Define the resolved params structure (locale might be optional now)
 type ResolvedParams = {
-  locale?: string; // Make locale optional
+  locale?: string;
 };
 
 export async function generateMetadata({
@@ -15,7 +14,7 @@ export async function generateMetadata({
   params: Promise<ResolvedParams>;
 }): Promise<Metadata> {
   const params = await paramsPromise;
-  // Get locale from params or fallback to getLocale()
+
   const locale = params?.locale ?? (await getLocale());
 
   setRequestLocale(locale);
@@ -32,11 +31,11 @@ export default async function NotFoundPage({
   params: Promise<ResolvedParams>;
 }) {
   const params = await paramsPromise;
-  // Get locale from params or fallback to getLocale()
+
   const locale = params?.locale ?? (await getLocale());
 
   setRequestLocale(locale);
-  // Use the determined locale
+
   const t = await getTranslations({ locale, namespace: 'NotFoundPage' });
 
   return (

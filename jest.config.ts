@@ -1,28 +1,40 @@
 import type { Config } from 'jest';
-import nextJest from 'next/jest';
+import nextJest from 'next/jest.js';
 
 const createJestConfig = nextJest({
   dir: './',
 });
 
-const customJestConfig: Config = {
+
+
+
+// Add any custom config to be passed to Jest
+const config: Config = {
+  coverageProvider: 'v8',
+  testEnvironment: 'jsdom',
+
+  // Add more setup options before each test is run
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts', '<rootDir>/jest-dom-setup.ts'],
-  testEnvironment: 'jest-environment-jsdom',
+  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/'],
+
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/'],
-  transformIgnorePatterns: [
-    '/node_modules/(?!(next-intl)/)'
-  ],
   moduleDirectories: ['node_modules', '<rootDir>'],
+
+  // Revert to the simpler pattern for transforming next-intl
+  transformIgnorePatterns: [
+    '/node_modules/(?!(next-intl)/)',
+  ],
+  collectCoverage: true,
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
     '!src/**/*.d.ts',
-    '!src/middleware.ts',
-    '!src/app/api/**',
-    '!**/node_modules/**',
+    '!src/**/index.ts',
+    '!src/@types/**',
+    '!src/utils/supabase/**',
   ],
 };
 
-export default createJestConfig(customJestConfig);
+// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
+export default createJestConfig(config);

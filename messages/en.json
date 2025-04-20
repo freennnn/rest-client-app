@@ -134,5 +134,91 @@
     "description": "An unexpected error occurred.",
     "tryAgain": "Try again",
     "backToHome": "Go back home"
+  },
+  "RestClientPage": {
+    "title": "RESTful Client",
+    "variablesNotification": "Using variables! Final values will be substituted before sending.",
+    "invalidJsonError": "Invalid JSON format. Cannot prettify.",
+    "unknownError": "An unknown error occurred"
+  },
+  "RequestForm": {
+    "headersLabel": "Headers",
+    "addHeaderButton": "Add Header",
+    "keyPlaceholder": "Key",
+    "valuePlaceholder": "Value",
+    "removeButton": "Remove",
+    "noHeaders": "No headers added",
+    "codeLabel": "Code",
+    "generatingCode": "Generating code...",
+    "bodyLabel": "Body",
+    "prettifyButton": "Prettify",
+    "bodyPlaceholderText": "Enter request body...",
+    "sendButton": "Send",
+    "sendingButton": "Sending..."
+  },
+  "ResponseDisplay": {
+    "title": "Response",
+    "statusLabel": "Status:",
+    "timeLabel": "Time:",
+    "sizeLabel": "Size:",
+    "noResponsePlaceholder": "Response will appear here after sending a request"
+  },
+  "CodeGenerator": {
+    "enterUrl": "Please enter a URL to generate code",
+    "error": "Error generating code. Please try again."
+  },
+  "Notifications": {
+    "networkErrorPrefix": "Network Request Failed: ",
+    "encodingErrorPrefix": "URL Encoding Error: ",
+    "unknownError": "An unknown error occurred",
+    "loadHistoryError": "Failed to load history from storage.",
+    "createHistoryLinkError": "Failed to create link for history item.",
+    "authCheckError": "Failed to check authentication status.",
+    "loadVariablesError": "Failed to load variables from local storage.",
+    "invalidJsonError": "Invalid JSON format. Cannot prettify."
+  },
+  "VariablesPage": {
+    "unauthenticatedMessage": "Please sign in to access variables.",
+    "title": "REST Client Variables",
+    "description": "Create variables to use in your requests with the syntax '{{'variableName'}}'",
+    "loadingFallback": "Loading variables editor..."
+  },
+  "VariablesEditor": {
+    "statusSaving": "Saving changes...",
+    "statusSaved": "Changes saved successfully",
+    "statusError": "Error saving changes",
+    "yourVariablesTitle": "Your Variables",
+    "noVariablesPlaceholder": "No variables defined yet. Create one below.",
+    "deleteButton": "Delete",
+    "addNewTitle": "Add New Variable",
+    "nameLabel": "Variable Name",
+    "namePlaceholder": "API_KEY",
+    "valueLabel": "Value",
+    "valuePlaceholder": "your-api-key-value",
+    "addButton": "Add Variable",
+    "usageTitle": "How to Use Variables",
+    "usageIntro": "Variables can be used in:",
+    "usageUrl": "URLs:",
+    "usageHeaders": "Headers:",
+    "usageBody": "Request Body:"
+  },
+  "HistoryPage": {
+    "title": "Request History",
+    "description": "View your previous API requests and easily restore them",
+    "loadingFallback": "Loading request history..."
+  },
+  "HistoryViewer": {
+    "emptyTitle": "You haven't executed any requests yet",
+    "emptyDescription": "It's empty here. Try:",
+    "restClientButton": "REST Client",
+    "clearConfirmationPrompt": "Are you sure? This cannot be undone.",
+    "clearConfirmationYes": "Yes, clear all",
+    "clearConfirmationCancel": "Cancel",
+    "clearButton": "Clear History",
+    "headersLabel": "Headers:"
+  },
+  "Footer": {
+    "copyright": "© {year} REST Client",
+    "builtWith": "Built with Next.js and TailwindCSS"
   }
 }
