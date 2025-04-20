@@ -137,7 +137,9 @@
   },
   "RestClientPage": {
     "title": "RESTful Client",
-    "variablesNotification": "This request uses variables that will be substituted when sent."
+    "variablesNotification": "Using variables! Final values will be substituted before sending.",
+    "invalidJsonError": "Invalid JSON format. Cannot prettify.",
+    "unknownError": "An unknown error occurred"
   },
   "RequestForm": {
     "headersLabel": "Headers",
@@ -166,7 +168,14 @@
     "error": "Error generating code. Please try again."
   },
   "Notifications": {
-    "networkErrorPrefix": "Network Request Failed: "
+    "networkErrorPrefix": "Network Request Failed: ",
+    "encodingErrorPrefix": "URL Encoding Error: ",
+    "unknownError": "An unknown error occurred",
+    "loadHistoryError": "Failed to load history from storage.",
+    "createHistoryLinkError": "Failed to create link for history item.",
+    "authCheckError": "Failed to check authentication status.",
+    "loadVariablesError": "Failed to load variables from local storage.",
+    "invalidJsonError": "Invalid JSON format. Cannot prettify."
   },
   "VariablesPage": {
     "unauthenticatedMessage": "Please sign in to access variables.",

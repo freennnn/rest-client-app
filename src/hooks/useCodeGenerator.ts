@@ -60,8 +60,7 @@ export function useCodeGenerator({ url, method, headers, contentType, body }: Co
 
         const data = await response.json();
         setGeneratedCode(data.code);
-      } catch (error) {
-        console.error('Error generating code:', error);
+      } catch {
         setGeneratedCode('CodeGenerator.error');
       } finally {
         setIsLoading(false);

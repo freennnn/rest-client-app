@@ -8,8 +8,7 @@ export function encodeSegment(segment: string): string {
         : Buffer.from(uriSafe, 'utf8').toString('base64'); // Node/Edge
     // Convert to URL-safe Base64: replace + with -, / with _, remove padding =
     return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  } catch (error) {
-    console.error('Error encoding segment:', error);
+  } catch {
     throw new Error('Failed to encode segment');
   }
 }
@@ -25,9 +24,7 @@ export function decodeSegment(encodedSegment: string): string {
         : Buffer.from(base64, 'base64').toString('utf8'); // Node/Edge
 
     return decodeURIComponent(decodedUriSafe);
-  } catch (error) {
-    console.error('Error decoding segment:', encodedSegment, error);
-
+  } catch {
     return encodedSegment;
   }
 }

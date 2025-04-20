@@ -28,28 +28,22 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
   const supabase = createClient();
 
   useEffect(() => {
-    console.log('AuthProvider: Initializing auth state...');
-
     const initializeAuth = async () => {
       try {
-        console.log('AuthProvider: Fetching initial session...');
         const {
           data: { session },
           error,
         } = await supabase.auth.getSession();
 
         if (error) {
-          console.error('AuthProvider: Error fetching session:', error);
           setUser(null);
           setIsAuthenticated(false);
           return;
         }
 
-        console.log('AuthProvider: Session fetched:', session ? 'exists' : 'null');
         setUser(session?.user ?? null);
         setIsAuthenticated(!!session?.user);
-      } catch (error) {
-        console.error('AuthProvider: Unexpected error during initialization:', error);
+      } catch {
         setUser(null);
         setIsAuthenticated(false);
       } finally {
@@ -59,18 +53,10 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
 
     initializeAuth();
 
-    console.log('AuthProvider: Setting up auth state change listener...');
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log(
-        'AuthProvider: Auth state changed:',
-        event,
-        session ? 'session exists' : 'no session'
-      );
-
       if (event === 'SIGNED_OUT') {
-        console.log('AuthProvider: Handling sign out event');
         setUser(null);
         setIsAuthenticated(false);
         return;
@@ -81,7 +67,6 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
     });
 
     return () => {
-      console.log('AuthProvider: Cleaning up auth state change listener');
       subscription.unsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

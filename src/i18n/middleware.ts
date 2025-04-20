@@ -23,9 +23,7 @@ export const withIntl: MiddlewareFactory = (next) => {
     }
     const responseFromNext = await next(request, event);
     if (!(responseFromNext instanceof NextResponse)) {
-      console.log(
-        'No response from next middleware, fallback to default NextResponse.next() or next-intl response in our case'
-      );
+      // No response from next middleware, fallback to default NextResponse.next() or next-intl response in our case
       return intlResponse;
     }
     const rewriteHeader = intlResponse.headers.get('x-middleware-rewrite');

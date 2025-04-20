@@ -9,6 +9,7 @@ import { restClientPath } from '@/paths';
 import { Header, Method } from '@/types/types';
 import { encodeSegment } from '@/utils/rest-client/urlEncoder';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 export interface HistoryRecord {
   id: string;
@@ -27,6 +28,7 @@ export default function HistoryViewer() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const router = useRouter();
   const t = useTranslations('HistoryViewer');
+  const tNotify = useTranslations('Notifications');
 
   useEffect(() => {
     try {
@@ -35,12 +37,12 @@ export default function HistoryViewer() {
         const parsedHistory = JSON.parse(savedHistory) as HistoryRecord[];
         setHistory(parsedHistory.sort((a, b) => b.timestamp - a.timestamp));
       }
-    } catch (error) {
-      console.error('Failed to parse history from localStorage:', error);
+    } catch {
+      toast.error(tNotify('loadHistoryError'));
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [tNotify]);
 
   const openRequest = (request: HistoryRecord) => {
     try {
@@ -71,8 +73,8 @@ export default function HistoryViewer() {
       }
 
       router.push(targetPath);
-    } catch (error) {
-      console.error('Failed to construct or navigate to history item path:', error);
+    } catch {
+      toast.error(tNotify('createHistoryLinkError'));
     }
   };
 

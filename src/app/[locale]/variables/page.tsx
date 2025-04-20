@@ -4,6 +4,7 @@ import { Suspense, lazy, useEffect, useState } from 'react';
 
 import { createClient } from '@/utils/supabase/client';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 const VariablesEditor = lazy(() => import('@/components/VariablesEditor'));
 
@@ -11,6 +12,7 @@ export default function VariablesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const t = useTranslations('VariablesPage');
+  const tNotify = useTranslations('Notifications');
 
   useEffect(() => {
     const checkAuthAndLoadVariables = async () => {
@@ -24,22 +26,21 @@ export default function VariablesPage() {
           try {
             const savedVariables = localStorage.getItem('restClientVariables');
             if (savedVariables) {
-              console.log('Loaded variables from local storage after authentication');
             }
-          } catch (error) {
-            console.error('Failed to load variables from localStorage:', error);
+          } catch {
+            toast.error(tNotify('loadVariablesError'));
           }
         }
 
         setIsLoading(false);
-      } catch (error) {
-        console.error('Error checking authentication:', error);
+      } catch {
+        toast.error(tNotify('authCheckError'));
         setIsLoading(false);
       }
     };
 
     checkAuthAndLoadVariables();
-  }, []);
+  }, [tNotify]);
 
   if (!isLoading && !isAuthenticated) {
     return (

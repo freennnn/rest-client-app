@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 import { Header } from '../types/types';
 
@@ -57,6 +58,7 @@ export default function RequestForm({
   error,
 }: RequestFormProps) {
   const t = useTranslations();
+  const tNotify = useTranslations('Notifications');
 
   const addHeader = () => {
     const newId = `header-${Date.now()}`;
@@ -79,7 +81,8 @@ export default function RequestForm({
         const parsed = JSON.parse(requestBody);
         setRequestBody(JSON.stringify(parsed, null, 2));
       } catch (e) {
-        console.error('Invalid JSON format', e);
+        const message = e instanceof Error ? e.message : tNotify('invalidJsonError');
+        toast.error(message);
       }
     }
   };
@@ -108,7 +111,7 @@ export default function RequestForm({
         </Select>
         <Input
           type='url'
-          placeholder='Enter endpoint URL'
+          placeholder={t('RequestForm.urlPlaceholder')}
           className='flex-1'
           value={url}
           onChange={(e) => setUrl(e.target.value)}

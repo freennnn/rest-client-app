@@ -62,7 +62,7 @@ export default async function RestClientPage({
     try {
       initialDecodedUrl = decodeSegment(initialEncodedUrl);
     } catch (err) {
-      console.error('Failed to decode URL segment on server:', err);
+      throw err;
     }
   }
 
@@ -71,7 +71,7 @@ export default async function RestClientPage({
     try {
       initialDecodedBody = decodeSegment(initialEncodedBody);
     } catch (err) {
-      console.error('Failed to decode body segment on server:', err);
+      throw err;
     }
   }
 

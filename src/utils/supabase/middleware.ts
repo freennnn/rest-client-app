@@ -9,9 +9,6 @@ export const withSupabase: MiddlewareFactory = (next) => {
 
     const responseFromNext = await next(request, event);
     if (!(responseFromNext instanceof NextResponse)) {
-      console.error(
-        '[Supabase Middleware] Base handler failed: Response is not an instance of NextResponse'
-      );
       return new NextResponse('Internal Server Error', { status: 500 });
     }
     const supabaseResponse = responseFromNext;
@@ -31,7 +28,8 @@ export const withSupabase: MiddlewareFactory = (next) => {
                 supabaseResponse.cookies.set(name, value, options);
               });
             } catch (error) {
-              console.error('[Supabase setAll] Error setting cookies:', error);
+              const newError = Error(`[Supabase Middleware] Error handling cookies: ${error}`);
+              throw newError;
             }
           },
         },

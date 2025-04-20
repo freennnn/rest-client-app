@@ -95,8 +95,7 @@ export default function RestClientFormClient({
             try {
               history = JSON.parse(savedHistory);
               if (!Array.isArray(history)) history = [];
-            } catch (e) {
-              console.error('Failed to parse history, resetting:', e);
+            } catch {
               history = [];
             }
           }
@@ -106,10 +105,7 @@ export default function RestClientFormClient({
             history = history.slice(0, MAX_HISTORY_ITEMS);
           }
           localStorage.setItem('restClientHistory', JSON.stringify(history));
-          console.log('Request saved to history');
-        } catch (err) {
-          console.error('Failed to save request to history:', err);
-        }
+        } catch {}
       };
 
       try {
@@ -163,11 +159,14 @@ export default function RestClientFormClient({
 
           window.history.replaceState({}, '', urlPath);
         } catch (encodingError) {
-          console.error('Error encoding URL/Body/Headers for history update:', encodingError);
+          const message =
+            encodingError instanceof Error
+              ? encodingError.message
+              : t('Notifications.unknownError');
+          toast.error(`${t('Notifications.encodingErrorPrefix')}${message}`);
         }
       } catch (err) {
-        console.error('Request failed:', err);
-        const message = err instanceof Error ? err.message : 'An unknown error occurred';
+        const message = err instanceof Error ? err.message : t('Notifications.unknownError');
         toast.error(`${t('Notifications.networkErrorPrefix')}${message}`);
       } finally {
         setLoading(false);
