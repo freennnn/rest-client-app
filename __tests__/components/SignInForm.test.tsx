@@ -7,53 +7,50 @@ import { useAuthActions } from '@/hooks/useAuthActions';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-// Mock the useAuthActions hook
+// --- Mocks (Inline) ---
 jest.mock('@/hooks/useAuthActions');
 const mockUseAuthActions = useAuthActions as jest.Mock;
 
-// Mock @/i18n/navigation completely
+// Mock navigation
 jest.mock('@/i18n/navigation', () => ({
-  // Remove: ...jest.requireActual('@/i18n/navigation'),
-  Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
-    <a href={href} {...props}>
-      {children}
-    </a>
-  ),
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-    prefetch: jest.fn(),
-    refresh: jest.fn(),
-  }),
-  usePathname: () => '/',
-  // Add other exports from @/i18n/navigation if needed
+  useRouter: jest.fn(() => ({ push: jest.fn(), refresh: jest.fn() })),
+  usePathname: jest.fn(() => '/'),
+  Link: ({
+    href,
+    children,
+    ...props
+  }: {
+    href: string;
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }) => React.createElement('a', { href, ...props }, children),
+  getPathname: jest.fn(() => '/'),
+  redirect: jest.fn(),
 }));
 
-// Mock next-intl completely, without requireActual
+// Mock next-intl
 jest.mock('next-intl', () => ({
-  // Provide mocks for everything potentially imported from 'next-intl'
-  useTranslations: () => (key: string) => {
-    // Return only the final part of the key (after the last dot)
-    const keyParts = key.split('.');
-    return keyParts[keyParts.length - 1];
-  },
-  useLocale: () => 'en',
-  // Provide a basic mock Provider if needed by the test setup
+  useTranslations: jest.fn(() => (key: string) => key.split('.').pop() || key),
+  useLocale: jest.fn(() => 'en'),
   NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  // Add other exports if they are ever imported from 'next-intl' directly
-  // e.g., Link, useRouter, usePathname (though often imported from @/i18n/navigation)
 }));
 
-// Mock sonner toast
+// Mock the component importing next-intl
+jest.mock('@/components/ui/TranslateFormMessage', () => {
+  // Use the globally mocked t function (mockT)
+  const mockTranslate = (key: string) => key.split('.').pop() || key;
+  return {
+    TranslatedFormMessage: ({ children }: { children: React.ReactNode }) => {
+      // Translate the child (which is the key)
+      const message = typeof children === 'string' ? mockTranslate(children) : children;
+      return <p>{message}</p>;
+    },
+  };
+});
+
+// Mock sonner
 jest.mock('sonner', () => ({
-  toast: {
-    success: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
-    warning: jest.fn(),
-  },
+  toast: { success: jest.fn(), error: jest.fn(), info: jest.fn(), warning: jest.fn() },
 }));
 
 // Helper function to render with providers

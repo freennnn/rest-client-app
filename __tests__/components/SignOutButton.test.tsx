@@ -1,58 +1,60 @@
 import React from 'react';
 
+// import { act } from 'react'; // Removed unused import
+
 import { SignOutButton } from '@/components/SignOutButton';
 import { useAuthActions } from '@/hooks/useAuthActions';
 // import messages from '@/messages/en.json'; // Removed: No longer needed with mock
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-// Mock the useAuthActions hook
+// --- Mocks (Inline) ---
 jest.mock('@/hooks/useAuthActions');
 const mockUseAuthActions = useAuthActions as jest.Mock;
 
-// Mock @/i18n/navigation completely (needed by useAuthActions)
-jest.mock('@/i18n/navigation', () => ({
-  Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
-    <a href={href} {...props}>
-      {children}
-    </a>
-  ),
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-    prefetch: jest.fn(),
-    refresh: jest.fn(),
-  }),
-  usePathname: () => '/',
+// Mock routing first (dependency of navigation)
+jest.mock('@/i18n/routing', () => ({
+  locales: ['en', 'ru'],
+  routing: {
+    locales: ['en', 'ru'],
+    defaultLocale: 'en',
+  },
 }));
 
-// Mock next-intl completely, without requireActual
+// Mock navigation
+jest.mock('@/i18n/navigation', () => ({
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+    refresh: jest.fn(),
+  })),
+  usePathname: jest.fn(() => '/'),
+  Link: ({
+    href,
+    children,
+    ...props
+  }: {
+    href: string;
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }) => React.createElement('a', { href, ...props }, children),
+  getPathname: jest.fn(() => '/'),
+  redirect: jest.fn(),
+}));
+
+// Mock next-intl
 jest.mock('next-intl', () => ({
-  useTranslations: () => (key: string) => {
-    // Return only the final part of the key (after the last dot)
-    const keyParts = key.split('.');
-    return keyParts[keyParts.length - 1];
-  },
+  useTranslations: () => (key: string) => key.split('.').pop() || key,
   useLocale: () => 'en',
-  // Add other exports from next-intl if needed by this test or its dependencies
   NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-// // Mock sonner toast (in case useAuthActions uses it internally, though not directly visible here) - Keeping this commented as it was before
-// jest.mock('sonner', () => ({
-//   toast: {
-//     success: jest.fn(),
-//     error: jest.fn(),
-//     info: jest.fn(),
-//     warning: jest.fn(),
-//   },
-// }));
+// Mock sonner
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), info: jest.fn(), warning: jest.fn() },
+}));
 
-// Helper function to render with providers
+// Helper function to render
 const renderSignOutButton = () => {
-  // No longer need NextIntlClientProvider wrapper due to the mock implementation
   return render(<SignOutButton />);
 };
 
