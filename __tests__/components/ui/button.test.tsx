@@ -1,15 +1,19 @@
 import React from 'react';
 
 import { Button } from '@/components/ui/button';
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import Link from 'next/link';
 
-jest.mock('@/lib/utils', () => ({
-  cn: (...inputs: (string | undefined | null | boolean | Record<string, boolean>)[]) =>
-    inputs.filter(Boolean).join(' '),
-}));
+jest.mock('@/lib/utils', () => {
+  const originalModule = jest.requireActual('@/lib/utils') as Record<string, unknown>;
+
+  return {
+    ...originalModule,
+    cn: (...inputs: (string | boolean | null | undefined)[]) => inputs.filter(Boolean).join(' '),
+  };
+});
 
 describe('Button Component', () => {
   it('renders a button with default styling', () => {

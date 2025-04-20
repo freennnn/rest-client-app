@@ -1,9 +1,5 @@
 import '@testing-library/jest-dom';
 
-declare global {
-  const jest: (typeof import('@jest/globals'))['jest'];
-}
-
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),
