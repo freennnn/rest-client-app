@@ -14,7 +14,6 @@ import '../globals.css';
 const geistSans = Geist({ subsets: ['latin'], variable: '--font-sans' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' });
 
-// Generate static params for locales
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }

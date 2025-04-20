@@ -10,7 +10,6 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as EmailOtpType | null;
-  console.log(`next=${searchParams.get('next')}`);
   const next = searchParams.get('next') ?? homePath();
   const locale = await getLocale();
   const t = await getTranslations('auth.errors');
@@ -26,7 +25,6 @@ export async function GET(request: NextRequest) {
         locale,
       });
     }
-    console.log(`confirm redirecting to ${next}`);
     redirect({
       href: next,
       locale,
