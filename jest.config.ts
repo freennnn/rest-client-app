@@ -14,9 +14,9 @@ const customJestConfig: Config = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/'],
-  // Transform next-intl and other ESM modules
   transformIgnorePatterns: [
-    'node_modules/(?!(next|next-intl|@swc|react-dnd|dnd-core|@react-dnd|react-textarea-autosize)/)'
+    '/node_modules/',
+    '\\.pnp\\.[^/]+$'
   ],
   moduleDirectories: ['node_modules', '<rootDir>'],
   // Configure coverage collection
