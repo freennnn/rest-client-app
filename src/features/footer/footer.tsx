@@ -1,8 +1,12 @@
 import rsLogo from '@public/rs-logo.svg';
+import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export const Footer = () => {
+export const Footer = async () => {
+  const t = await getTranslations('Footer');
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className='bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-3 px-6'>
       <div className='container mx-auto flex flex-wrap justify-center md:justify-between items-center gap-4'>
@@ -16,7 +20,9 @@ export const Footer = () => {
             <Image src={rsLogo} alt='rslogo' width={16} height={16} />
             RSschool
           </Link>
-          <span className='text-sm text-gray-600 dark:text-gray-300'>© 2025 REST Client</span>
+          <span className='text-sm text-gray-600 dark:text-gray-300'>
+            {t('copyright', { year: currentYear })}
+          </span>
         </div>
         <div className='flex gap-4 align-center justify-center text-sm text-gray-600 dark:text-gray-300'>
           <Link
@@ -44,9 +50,7 @@ export const Footer = () => {
             @magadanov
           </Link>
         </div>
-        <div className='text-sm text-gray-600 dark:text-gray-300'>
-          Built with Next.js and TailwindCSS
-        </div>
+        <div className='text-sm text-gray-600 dark:text-gray-300'>{t('builtWith')}</div>
       </div>
     </footer>
   );

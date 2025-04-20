@@ -6,18 +6,18 @@ const DEBOUNCE_DELAY = 500; // Debounce delay in milliseconds
 
 export function useCodeGenerator({ url, method, headers, contentType, body }: CodeGenOptions) {
   const [selectedLanguage, setSelectedLanguage] = useState('curl');
-  const [generatedCode, setGeneratedCode] = useState('');
+  const [generatedCode, setGeneratedCode] = useState('CodeGenerator.enterUrl');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const generateCode = async () => {
       if (!url) {
-        setGeneratedCode('Please enter a URL to generate code');
-        setIsLoading(false); // Ensure loading is false if no URL
+        setGeneratedCode('CodeGenerator.enterUrl');
+        setIsLoading(false);
         return;
       }
 
-      setIsLoading(true); // Set loading true when the actual fetch starts
+      setIsLoading(true);
 
       try {
         const headersList = headers
@@ -54,7 +54,7 @@ export function useCodeGenerator({ url, method, headers, contentType, body }: Co
         });
 
         if (!response.ok) {
-          const errorText = await response.text(); // Try to get more error info
+          const errorText = await response.text();
           throw new Error(`Failed to generate code: ${response.status} ${errorText}`);
         }
 
@@ -62,24 +62,20 @@ export function useCodeGenerator({ url, method, headers, contentType, body }: Co
         setGeneratedCode(data.code);
       } catch (error) {
         console.error('Error generating code:', error);
-        setGeneratedCode('Error generating code. Please try again.');
+        setGeneratedCode('CodeGenerator.error');
       } finally {
-        setIsLoading(false); // Set loading false when fetch completes or fails
+        setIsLoading(false);
       }
     };
 
-    // --- Debounce Logic ---
-    // Set a timeout to call generateCode after the delay
     const timeoutId = setTimeout(() => {
       generateCode();
     }, DEBOUNCE_DELAY);
 
-    // Cleanup function: clear the timeout if dependencies change before delay is over
     return () => {
       clearTimeout(timeoutId);
     };
-    // ---------------------
-  }, [url, method, headers, body, contentType, selectedLanguage]); // Dependencies remain the same
+  }, [url, method, headers, body, contentType, selectedLanguage]);
 
   return {
     selectedLanguage,

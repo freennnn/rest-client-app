@@ -17,6 +17,7 @@ import {
   processHeaders,
   processUrl,
 } from '@/utils/variables/variableSubstitution';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
 //import { useSearchParams } from 'next/navigation';
@@ -40,6 +41,10 @@ export default function RestClientFormClient({
   initialBody,
   initialHeaders,
 }: RestClientFormClientProps) {
+  // Initialize translation functions
+  const t = useTranslations(); // Using default namespace
+  // Alternative: const tPage = useTranslations('RestClientPage'); const tNotify = useTranslations('Notifications');
+
   const [url, setUrl] = useState(initialUrl);
   const [method, setMethod] = useState(initialMethod); // Initial method is validated by server
   const [requestBody, setRequestBody] = useState(initialBody);
@@ -199,22 +204,22 @@ export default function RestClientFormClient({
         // Network/fetch error: Show toast instead of setting local error state
         console.error('Request failed:', err); // Log the full error for debugging
         const message = err instanceof Error ? err.message : 'An unknown error occurred';
-        toast.error(`Network Request Failed: ${message}`);
+        toast.error(`${t('Notifications.networkErrorPrefix')}${message}`);
         // Do NOT set the local 'error' state here
         // setError(`Request failed: ${message}`);
       } finally {
         setLoading(false);
       }
     },
-    [url, method, headers, contentType, requestBody, locale, usingVariables]
-  ); // Add locale to dependencies
+    [url, method, headers, contentType, requestBody, locale, usingVariables, t]
+  );
 
   // --- Render UI ---
   return (
     <div className='min-h-screen p-4 max-w-5xl mx-auto'>
       <header className='mb-6'>
         {/* Display locale from props */}
-        <h1 className='text-2xl font-bold mb-2'>RESTful Client ({locale})</h1>
+        <h1 className='text-2xl font-bold mb-2'>{t('RestClientPage.title', { locale })}</h1>
         {usingVariables && (
           <div className='bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-2 mb-4 rounded'>
             <p className='flex items-center'>
@@ -233,7 +238,8 @@ export default function RestClientFormClient({
                   d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
                 ></path>
               </svg>
-              This request uses variables that will be substituted when sent.
+              {/* Use translation key */}
+              {t('RestClientPage.variablesNotification')}
             </p>
           </div>
         )}
