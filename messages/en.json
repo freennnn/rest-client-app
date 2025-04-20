@@ -207,5 +207,9 @@
     "clearConfirmationCancel": "Cancel",
     "clearButton": "Clear History",
     "headersLabel": "Headers:"
+  },
+  "Footer": {
+    "copyright": "© {year} REST Client",
+    "builtWith": "Built with Next.js and TailwindCSS"
   }
 }

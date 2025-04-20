@@ -230,5 +230,9 @@
     "clearConfirmationCancel": "Отмена",
     "clearButton": "Очистить историю",
     "headersLabel": "Заголовки:"
+  },
+  "Footer": {
+    "copyright": "© {year} REST Client",
+    "builtWith": "Создано с помощью Next.js и TailwindCSS"
   }
 }

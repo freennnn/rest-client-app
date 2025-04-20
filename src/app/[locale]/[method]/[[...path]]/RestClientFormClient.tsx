@@ -211,8 +211,8 @@ export default function RestClientFormClient({
         setLoading(false);
       }
     },
-    [url, method, headers, contentType, requestBody, locale, usingVariables]
-  ); // Add locale to dependencies
+    [url, method, headers, contentType, requestBody, locale, usingVariables, t]
+  );
 
   // --- Render UI ---
   return (
