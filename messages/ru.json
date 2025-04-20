@@ -190,5 +190,30 @@
   },
   "Notifications": {
     "networkErrorPrefix": "Сетевая ошибка: "
+  },
+  "VariablesPage": {
+    "unauthenticatedMessage": "Пожалуйста, войдите, чтобы получить доступ к переменным.",
+    "title": "Переменные REST-клиента",
+    "description": "Создавайте переменные для использования в запросах с синтаксисом '{{'variableName'}}'",
+    "loadingFallback": "Загрузка редактора переменных..."
+  },
+  "VariablesEditor": {
+    "statusSaving": "Сохранение изменений...",
+    "statusSaved": "Изменения успешно сохранены",
+    "statusError": "Ошибка сохранения изменений",
+    "yourVariablesTitle": "Ваши переменные",
+    "noVariablesPlaceholder": "Переменные еще не определены. Создайте одну ниже.",
+    "deleteButton": "Удалить",
+    "addNewTitle": "Добавить новую переменную",
+    "nameLabel": "Имя переменной",
+    "namePlaceholder": "API_KEY",
+    "valueLabel": "Значение",
+    "valuePlaceholder": "значение-вашего-api-ключа",
+    "addButton": "Добавить переменную",
+    "usageTitle": "Как использовать переменные",
+    "usageIntro": "Переменные можно использовать в:",
+    "usageUrl": "URL:",
+    "usageHeaders": "Заголовках:",
+    "usageBody": "Теле запроса:"
   }
 }

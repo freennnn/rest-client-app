@@ -2,14 +2,19 @@
 
 import { useEffect, useState } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { loadVariables, saveVariables } from '@/utils/variables/variableStorage';
 import { Variable } from '@/utils/variables/variableSubstitution';
+import { useTranslations } from 'next-intl';
 
 export default function VariablesEditor() {
   const [variables, setVariables] = useState<Variable[]>([]);
   const [newVarName, setNewVarName] = useState('');
   const [newVarValue, setNewVarValue] = useState('');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const t = useTranslations('VariablesEditor');
 
   useEffect(() => {
     const storedVariables = loadVariables();
@@ -60,10 +65,9 @@ export default function VariablesEditor() {
 
   return (
     <div className='space-y-6'>
-      {/* Save status indicator */}
       {saveStatus !== 'idle' && (
         <div
-          className={`p-2 rounded flex items-center ${
+          className={`p-2 rounded flex items-center text-sm ${
             saveStatus === 'saving'
               ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
               : saveStatus === 'saved'
@@ -74,7 +78,7 @@ export default function VariablesEditor() {
           {saveStatus === 'saving' && (
             <>
               <div className='animate-spin h-4 w-4 border-2 border-yellow-600 dark:border-yellow-400 rounded-full border-t-transparent mr-2'></div>
-              Saving changes...
+              {t('statusSaving')}
             </>
           )}
           {saveStatus === 'saved' && (
@@ -93,7 +97,7 @@ export default function VariablesEditor() {
                   d='M5 13l4 4L19 7'
                 ></path>
               </svg>
-              Changes saved successfully
+              {t('statusSaved')}
             </>
           )}
           {saveStatus === 'error' && (
@@ -112,19 +116,17 @@ export default function VariablesEditor() {
                   d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
                 ></path>
               </svg>
-              Error saving changes
+              {t('statusError')}
             </>
           )}
         </div>
       )}
 
       <div className='bg-white dark:bg-gray-800 p-4 rounded-lg shadow'>
-        <h2 className='text-xl font-semibold mb-4'>Your Variables</h2>
+        <h2 className='text-xl font-semibold mb-4'>{t('yourVariablesTitle')}</h2>
 
         {variables.length === 0 ? (
-          <p className='text-gray-500 dark:text-gray-400'>
-            No variables defined yet. Create one below.
-          </p>
+          <p className='text-gray-500 dark:text-gray-400'>{t('noVariablesPlaceholder')}</p>
         ) : (
           <div className='space-y-2'>
             {variables.map((variable) => (
@@ -132,25 +134,29 @@ export default function VariablesEditor() {
                 key={variable.id}
                 className='flex items-center space-x-2 p-2 border dark:border-gray-700 rounded'
               >
-                <div className='font-mono'>
+                <div className='font-mono text-sm w-1/3 overflow-hidden text-ellipsis whitespace-nowrap'>
                   {'{{'}
                   {variable.name}
                   {'}}'}
                 </div>
                 <div className='flex-1'>
-                  <input
+                  <Input
                     type='text'
                     value={variable.value}
-                    onChange={(e) => updateVariable(variable.id, e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      updateVariable(variable.id, e.target.value)
+                    }
                     className='w-full p-1 border dark:border-gray-700 dark:bg-gray-900 rounded'
                   />
                 </div>
-                <button
+                <Button
                   onClick={() => deleteVariable(variable.id)}
-                  className='p-1 text-red-500 hover:text-red-700'
+                  variant='ghost'
+                  size='sm'
+                  className='text-red-500 hover:text-red-700'
                 >
-                  Delete
-                </button>
+                  {t('deleteButton')}
+                </Button>
               </div>
             ))}
           </div>
@@ -158,51 +164,51 @@ export default function VariablesEditor() {
       </div>
 
       <div className='bg-white dark:bg-gray-800 p-4 rounded-lg shadow'>
-        <h2 className='text-xl font-semibold mb-4'>Add New Variable</h2>
+        <h2 className='text-xl font-semibold mb-4'>{t('addNewTitle')}</h2>
         <div className='space-y-3'>
           <div>
-            <label htmlFor='varName' className='block mb-1'>
-              Variable Name
-            </label>
-            <input
+            <Label htmlFor='varName' className='block mb-1'>
+              {t('nameLabel')}
+            </Label>
+            <Input
               id='varName'
               type='text'
               value={newVarName}
-              onChange={(e) => setNewVarName(e.target.value)}
-              placeholder='API_KEY'
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewVarName(e.target.value)}
+              placeholder={t('namePlaceholder')}
               className='w-full p-2 border dark:border-gray-700 dark:bg-gray-900 rounded'
             />
           </div>
           <div>
-            <label htmlFor='varValue' className='block mb-1'>
-              Value
-            </label>
-            <input
+            <Label htmlFor='varValue' className='block mb-1'>
+              {t('valueLabel')}
+            </Label>
+            <Input
               id='varValue'
               type='text'
               value={newVarValue}
-              onChange={(e) => setNewVarValue(e.target.value)}
-              placeholder='your-api-key-value'
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewVarValue(e.target.value)}
+              placeholder={t('valuePlaceholder')}
               className='w-full p-2 border dark:border-gray-700 dark:bg-gray-900 rounded'
             />
           </div>
-          <button
+          <Button
             onClick={addVariable}
             disabled={!newVarName.trim()}
             className='px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded disabled:opacity-50'
           >
-            Add Variable
-          </button>
+            {t('addButton')}
+          </Button>
         </div>
       </div>
 
       <div className='bg-white dark:bg-gray-800 p-4 rounded-lg shadow'>
-        <h2 className='text-xl font-semibold mb-2'>How to Use Variables</h2>
+        <h2 className='text-xl font-semibold mb-2'>{t('usageTitle')}</h2>
         <div className='space-y-2 text-sm'>
-          <p>Variables can be used in:</p>
+          <p>{t('usageIntro')}</p>
           <ul className='list-disc pl-5 space-y-1'>
             <li>
-              URLs:{' '}
+              {t('usageUrl')}{' '}
               <code className='bg-gray-100 dark:bg-gray-900 p-1 rounded'>
                 https://api.example.com/{'{{'}
                 <span>API_VERSION</span>
@@ -210,7 +216,7 @@ export default function VariablesEditor() {
               </code>
             </li>
             <li>
-              Headers:{' '}
+              {t('usageHeaders')}{' '}
               <code className='bg-gray-100 dark:bg-gray-900 p-1 rounded'>
                 Authorization: Bearer {'{{'}
                 <span>TOKEN</span>
@@ -218,7 +224,7 @@ export default function VariablesEditor() {
               </code>
             </li>
             <li>
-              Request Body:{' '}
+              {t('usageBody')}{' '}
               <code className='bg-gray-100 dark:bg-gray-900 p-1 rounded'>
                 {'{ "apiKey": "'}
                 {'{{'}

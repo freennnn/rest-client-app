@@ -167,5 +167,30 @@
   },
   "Notifications": {
     "networkErrorPrefix": "Network Request Failed: "
+  },
+  "VariablesPage": {
+    "unauthenticatedMessage": "Please sign in to access variables.",
+    "title": "REST Client Variables",
+    "description": "Create variables to use in your requests with the syntax '{{'variableName'}}'",
+    "loadingFallback": "Loading variables editor..."
+  },
+  "VariablesEditor": {
+    "statusSaving": "Saving changes...",
+    "statusSaved": "Changes saved successfully",
+    "statusError": "Error saving changes",
+    "yourVariablesTitle": "Your Variables",
+    "noVariablesPlaceholder": "No variables defined yet. Create one below.",
+    "deleteButton": "Delete",
+    "addNewTitle": "Add New Variable",
+    "nameLabel": "Variable Name",
+    "namePlaceholder": "API_KEY",
+    "valueLabel": "Value",
+    "valuePlaceholder": "your-api-key-value",
+    "addButton": "Add Variable",
+    "usageTitle": "How to Use Variables",
+    "usageIntro": "Variables can be used in:",
+    "usageUrl": "URLs:",
+    "usageHeaders": "Headers:",
+    "usageBody": "Request Body:"
   }
 }
