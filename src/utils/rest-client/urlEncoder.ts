@@ -1,72 +1,44 @@
-export function encodeRequestUrl(url: string): string {
+// Generic function for encoding URL or Body path segments
+export function encodeSegment(segment: string): string {
   try {
-    return btoa(encodeURIComponent(url));
+    // Standard URI encoding first
+    const uriSafe = encodeURIComponent(segment);
+    // Base64 encode, choosing implementation based on environment
+    const base64 =
+      typeof globalThis.btoa === 'function'
+        ? globalThis.btoa(uriSafe) // Browser
+        : Buffer.from(uriSafe, 'utf8').toString('base64'); // Node/Edge
+    // Convert to URL-safe Base64: replace + with -, / with _, remove padding =
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   } catch (error) {
-    console.error('Error encoding URL:', error);
-    throw new Error('Failed to encode URL');
+    console.error('Error encoding segment:', error);
+    throw new Error('Failed to encode segment');
   }
 }
 
-export function decodeRequestUrl(encodedUrl: string): string {
+// Generic function for decoding URL or Body path segments
+export function decodeSegment(encodedSegment: string): string {
   try {
-    const isValidBase64 = /^[A-Za-z0-9+/]*={0,2}$/.test(encodedUrl);
-    if (!isValidBase64) {
-      console.warn('Invalid base64 string encountered in URL:', encodedUrl);
-      return encodedUrl;
-    }
+    // Restore standard Base64 characters: replace - with +, _ with /
+    const base64 = encodedSegment.replace(/-/g, '+').replace(/_/g, '/');
+    // Add padding if necessary (though Buffer/atob might not strictly need it)
+    // while (base64.length % 4) {
+    //   base64 += '=';
+    // }
 
-    return decodeURIComponent(atob(encodedUrl));
+    // Decode Base64 based on environment
+    const decodedUriSafe =
+      typeof globalThis.atob === 'function'
+        ? globalThis.atob(base64) // Browser
+        : Buffer.from(base64, 'base64').toString('utf8'); // Node/Edge
+
+    // Decode URI components
+    return decodeURIComponent(decodedUriSafe);
   } catch (error) {
-    console.error('Error decoding URL:', error);
-    return encodedUrl;
-  }
-}
-
-export function encodeRequestBody(body: string): string {
-  try {
-    return btoa(encodeURIComponent(body));
-  } catch (error) {
-    console.error('Error encoding request body:', error);
-    throw new Error('Failed to encode request body');
-  }
-}
-
-export function decodeRequestBody(encodedBody: string): string {
-  try {
-    const isValidBase64 = /^[A-Za-z0-9+/]*={0,2}$/.test(encodedBody);
-    if (!isValidBase64) {
-      console.warn('Invalid base64 string encountered in request body:', encodedBody);
-      return encodedBody;
-    }
-
-    return decodeURIComponent(atob(encodedBody));
-  } catch (error) {
-    console.error('Error decoding request body:', error);
-    return encodedBody;
-  }
-}
-
-export function encodeHeaderKeyValue(value: string): string {
-  try {
-    return btoa(encodeURIComponent(value));
-  } catch (error) {
-    console.error('Error encoding header value:', error);
-    throw new Error('Failed to encode header value');
-  }
-}
-
-export function decodeHeaderKeyValue(encodedValue: string): string {
-  try {
-    const isValidBase64 = /^[A-Za-z0-9+/]*={0,2}$/.test(encodedValue);
-    if (!isValidBase64) {
-      console.warn('Invalid base64 string encountered in header:', encodedValue);
-      return encodedValue;
-    }
-
-    return decodeURIComponent(atob(encodedValue));
-  } catch (error) {
-    console.error('Error decoding header value:', error);
-    return encodedValue;
+    // Handle potential errors during Base64 or URI decoding
+    console.error('Error decoding segment:', encodedSegment, error);
+    // Return the original encoded string in case of error as a fallback
+    return encodedSegment;
   }
 }
 
@@ -76,13 +48,10 @@ export function parseHeadersFromSearchParams(
   const headers: Record<string, string> = {};
 
   searchParams.forEach((value, key) => {
-    try {
-      const decodedKey = decodeHeaderKeyValue(key);
-      const decodedValue = decodeHeaderKeyValue(value);
-      headers[decodedKey] = decodedValue;
-    } catch (error) {
-      console.error('Error decoding header:', error);
-    }
+    // Directly use key and value since they are already decoded by Next.js
+    // and decodeHeaderKeyValue is now an identity function.
+    headers[key] = value;
+    // Removed the try-catch as direct assignment is unlikely to throw here.
   });
 
   return headers;

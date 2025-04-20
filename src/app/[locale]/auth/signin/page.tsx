@@ -9,7 +9,7 @@ export default async function SignInPage({
   const email = typeof params.email === 'string' ? params.email : '';
 
   return (
-    <div className='flex min-h-svh w-full items-center justify-center p-6 md:p-10'>
+    <div className='flex w-full items-center justify-center p-6 py-10 md:p-10 md:py-16'>
       <div className='w-full max-w-sm'>
         <SignInForm email={email} />
       </div>

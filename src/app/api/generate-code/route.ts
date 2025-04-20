@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import codegen from 'postman-code-generators';
-import sdk from 'postman-collection';
+import { Request as PostmanRequest } from 'postman-collection';
 
 export async function POST(request: Request) {
   try {
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     const options = languageMap[language] || languageMap.curl;
 
-    const postmanReq = new sdk.Request({
+    const postmanReq = new PostmanRequest({
       url: reqOptions.url,
       method: reqOptions.method,
       header: reqOptions.header || [],

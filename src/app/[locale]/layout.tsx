@@ -14,6 +14,11 @@ import '../globals.css';
 const geistSans = Geist({ subsets: ['latin'], variable: '--font-sans' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' });
 
+// Generate static params for locales
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
 export default async function LocaleLayout({
   children,
   params,
@@ -32,13 +37,13 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
         <HydrationErrorHandler />
         <NextIntlClientProvider>
           <AuthenticationProvider>
-            <div className='relative flex min-h-screen flex-col'>
+            <div className='relative flex flex-col min-h-screen'>
               <Header />
               <main className='flex-1'>{children}</main>
               <Footer />

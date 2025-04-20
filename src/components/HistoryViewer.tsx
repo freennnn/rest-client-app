@@ -4,16 +4,16 @@ import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Link, useRouter } from '@/i18n/navigation';
 import { restClientPath } from '@/paths';
-import { Method } from '@/types/types';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Header, Method } from '@/types/types';
+import { encodeSegment } from '@/utils/rest-client/urlEncoder';
 
 export interface HistoryRecord {
   id: string;
   url: string;
   method: Method;
-  headers: { id: string; key: string; value: string }[];
+  headers: Header[];
   body?: string;
   contentType?: string;
   timestamp: number;
@@ -41,8 +41,37 @@ export default function HistoryViewer() {
   }, []);
 
   const openRequest = (request: HistoryRecord) => {
-    sessionStorage.setItem('restoreRequest', JSON.stringify(request));
-    router.push(restClientPath());
+    try {
+      let targetPath = `/${request.method}`;
+      const needsBodyInPath = ['POST', 'PUT', 'PATCH'].includes(request.method) && request.body;
+
+      if (request.url) {
+        targetPath += `/${encodeSegment(request.url)}`;
+        if (needsBodyInPath && request.body) {
+          targetPath += `/${encodeSegment(request.body)}`;
+        }
+      }
+
+      const queryParams = new URLSearchParams();
+      if (request.headers) {
+        request.headers.forEach((header) => {
+          const key = header.key.trim();
+          const value = header.value.trim();
+          if (key && value) {
+            queryParams.append(key, value);
+          }
+        });
+      }
+
+      const queryString = queryParams.toString();
+      if (queryString) {
+        targetPath += `?${queryString}`;
+      }
+
+      router.push(targetPath);
+    } catch (error) {
+      console.error('Failed to construct or navigate to history item path:', error);
+    }
   };
 
   const formatDate = (timestamp: number) => {
