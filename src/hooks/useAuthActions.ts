@@ -73,6 +73,8 @@ export function useAuthActions() {
           description: t('userAlreadyExistDescription'),
         });
         router.push(signInPath(email));
+        router.refresh();
+
         return {
           success: false,
           error: { message: 'User already exists', translatedMessage: t('userAlreadyExistTitle') },
@@ -101,6 +103,8 @@ export function useAuthActions() {
         description: t('signUpSuccessDescription'),
       });
       router.push(homePath());
+      router.refresh();
+
       return { success: true };
     } catch {
       const errorMessage = t('signUpFailedGeneric');
