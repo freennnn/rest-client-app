@@ -16,7 +16,6 @@ const config: Config = {
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/', 
     '<rootDir>/.next/',
-    '<rootDir>/__tests__/app/\\[locale\\]/not-found.test.tsx',
     '<rootDir>/__tests__/app/\\[locale\\]/404/page.test.tsx',
     '<rootDir>/__tests__/components/HistoryViewer.test.tsx'
   ],
