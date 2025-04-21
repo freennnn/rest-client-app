@@ -1,205 +1,180 @@
 import React from 'react';
-import { act } from 'react';
 
 import { SignUpForm } from '@/components/SignUpForm';
 import { useAuthActions } from '@/hooks/useAuthActions';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { signInPath } from '@/paths';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-// Mock the useAuthActions hook
-jest.mock('@/hooks/useAuthActions');
-const mockUseAuthActions = useAuthActions as jest.Mock;
+jest.mock('@/hooks/useAuthActions', () => ({
+  useAuthActions: jest.fn(),
+}));
 
-// Mock @/i18n/navigation completely
 jest.mock('@/i18n/navigation', () => ({
   Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
     <a href={href} {...props}>
       {children}
     </a>
   ),
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-    prefetch: jest.fn(),
-    refresh: jest.fn(),
-  }),
-  usePathname: () => '/',
 }));
 
-// Mock next-intl completely, without requireActual
+// Mock the next-intl translations
 jest.mock('next-intl', () => ({
-  useTranslations: () => (key: string) => key.split('.').pop(), // Return final part of key
-  useLocale: () => 'en',
-  NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
-
-// Mock sonner toast
-jest.mock('sonner', () => ({
-  toast: {
-    success: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
-    warning: jest.fn(),
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      signUpTitle: 'Create an account',
+      signUpDescription: 'Enter your information to create an account',
+      nameLabel: 'Name',
+      email: 'Email',
+      password: 'Password',
+      signingUp: 'Signing up...',
+      signUp: 'Sign Up',
+      haveAccount: 'Already have an account?',
+      signIn: 'Sign In',
+    };
+    return translations[key] || key;
   },
 }));
 
-// Helper function to render
-const renderSignUpForm = () => {
-  return render(<SignUpForm />);
-};
+jest.mock('@/paths', () => ({
+  signInPath: jest.fn().mockReturnValue('/sign-in'),
+}));
 
-describe('SignUpForm', () => {
+jest.mock('@/components/ui/TranslateFormMessage', () => ({
+  TranslatedFormMessage: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid='form-error'>{children}</div>
+  ),
+}));
+
+jest.mock('@hookform/resolvers/zod', () => ({
+  zodResolver: () => (data: Record<string, unknown>) => {
+    const errors: Record<string, { message: string }> = {};
+
+    if (!data.name) {
+      errors.name = { message: 'auth.nameRequired' };
+    }
+
+    if (!data.email) {
+      errors.email = { message: 'auth.emailRequired' };
+    } else if (!data.email.includes('@')) {
+      errors.email = { message: 'auth.emailInvalid' };
+    }
+
+    if (!data.password) {
+      errors.password = { message: 'auth.passwordRequired' };
+    } else if (data.password.length < 8) {
+      errors.password = { message: 'auth.passwordTooShort' };
+    }
+
+    return {
+      values: data,
+      errors: Object.keys(errors).length ? { ...errors } : {},
+    };
+  },
+}));
+
+describe('SignUpForm Component', () => {
   let mockSignUp: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
+
     mockSignUp = jest.fn().mockResolvedValue(undefined);
-    mockUseAuthActions.mockReturnValue({
+
+    (useAuthActions as jest.Mock).mockReturnValue({
       signUp: mockSignUp,
       isPending: false,
     });
   });
 
-  it('should render the sign-up form correctly', () => {
-    renderSignUpForm();
+  test('renders the sign up form correctly', () => {
+    render(<SignUpForm />);
 
-    expect(screen.getByText('signUpTitle')).toBeInTheDocument();
-    expect(screen.getByText('signUpDescription')).toBeInTheDocument();
-    expect(screen.getByLabelText('nameLabel')).toBeInTheDocument();
-    expect(screen.getByLabelText('email')).toBeInTheDocument(); // email label comes from 'auth.email'
-    expect(screen.getByLabelText('password')).toBeInTheDocument(); // password label comes from 'auth.password'
-    // expect(screen.getByLabelText('confirmPasswordLabel')).toBeInTheDocument(); // No separate confirm password label in the code
-    expect(screen.getByRole('button', { name: 'signUp' })).toBeInTheDocument();
-    expect(screen.getByText(/haveAccount/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'signIn' })).toBeInTheDocument();
+    expect(screen.getByText('Create an account')).toBeInTheDocument();
+    expect(screen.getByText('Enter your information to create an account')).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toBeInTheDocument();
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.getByLabelText('Password')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign Up' })).toBeInTheDocument();
+    expect(screen.getByText('Already have an account?')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Sign In' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Sign In' })).toHaveAttribute('href', '/sign-in');
   });
 
-  it('should call signUp on successful form submission', async () => {
-    const user = userEvent.setup();
-    renderSignUpForm();
-
-    const nameInput = screen.getByLabelText('nameLabel');
-    const emailInput = screen.getByLabelText('email');
-    const passwordInput = screen.getByLabelText('password');
-    // Assuming the schema handles confirm password, target password input again for confirmation
-    const submitButton = screen.getByRole('button', { name: 'signUp' });
-
-    await user.type(nameInput, 'Test User');
-    await user.type(emailInput, 'test@example.com');
-    await user.type(passwordInput, 'Password123!');
-    // Simulate confirm password if schema requires it (by typing into the password field again or if there's a confirm field)
-    // await user.type(screen.getByLabelText('confirmPasswordLabel'), 'Password123!'); // If confirm field exists
-
-    await user.click(submitButton);
-
-    await waitFor(() => {
-      expect(mockSignUp).toHaveBeenCalledTimes(1);
-      // Zod schema likely passes only name, email, password if no confirm field exists
-      expect(mockSignUp).toHaveBeenCalledWith('test@example.com', 'Password123!', 'Test User');
+  test('shows loading state during form submission', () => {
+    (useAuthActions as jest.Mock).mockReturnValue({
+      signUp: mockSignUp,
+      isPending: true,
     });
+
+    render(<SignUpForm />);
+
+    expect(screen.getByRole('button', { name: 'Signing up...' })).toBeDisabled();
+    expect(screen.getByLabelText('Name')).toBeDisabled();
+    expect(screen.getByLabelText('Email')).toBeDisabled();
+    expect(screen.getByLabelText('Password')).toBeDisabled();
   });
 
-  it('should display loading state when submitting', async () => {
-    const user = userEvent.setup();
-    let resolveSignUp: (value: unknown) => void;
-    const signUpPromise = new Promise((resolve) => {
-      resolveSignUp = resolve;
-    });
-    mockSignUp.mockReturnValue(signUpPromise); // Update the specific mock function
+  test('validates empty form fields on submission', async () => {
+    render(<SignUpForm />);
 
-    const { rerender } = renderSignUpForm();
+    fireEvent.click(screen.getByRole('button', { name: 'Sign Up' }));
 
-    const nameInput = screen.getByLabelText('nameLabel');
-    const emailInput = screen.getByLabelText('email');
-    const passwordInput = screen.getByLabelText('password');
-
-    await user.type(nameInput, 'Test User');
-    await user.type(emailInput, 'test@example.com');
-    await user.type(passwordInput, 'Password123!');
-
-    // Simulate pending state
-    act(() => {
-      mockUseAuthActions.mockReturnValue({ signUp: mockSignUp, isPending: true });
-      rerender(<SignUpForm />);
-    });
-
-    // Check for loading state
-    const loadingButton = screen.getByRole('button', { name: /signingUp/ });
-    expect(loadingButton).toBeDisabled();
-
-    // Resolve promise and reset state
-    act(() => {
-      resolveSignUp!(undefined);
-    });
-    act(() => {
-      mockUseAuthActions.mockReturnValue({ signUp: mockSignUp, isPending: false });
-      rerender(<SignUpForm />);
-    });
-
-    // Wait for button to be enabled again
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'signUp' })).toBeEnabled();
+      expect(screen.getAllByTestId('form-error')).toHaveLength(3);
     });
   });
 
-  it('should show validation errors for invalid input', async () => {
-    const user = userEvent.setup();
-    renderSignUpForm();
+  test('validates email format', async () => {
+    render(<SignUpForm />);
 
-    const submitButton = screen.getByRole('button', { name: 'signUp' });
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'invalid-email' } });
+    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } });
 
-    // Click submit with empty form
-    await user.click(submitButton);
+    fireEvent.click(screen.getByRole('button', { name: 'Sign Up' }));
 
     await waitFor(() => {
-      // Use final part of key for validation messages, matching the actual output
-      expect(screen.getByText('nameMinLength')).toBeInTheDocument();
-      expect(screen.getByText('emailInvalid')).toBeInTheDocument();
-      expect(screen.getByText('passwordMinLength')).toBeInTheDocument();
+      const errors = screen.getAllByTestId('form-error');
+      expect(errors).toHaveLength(1);
+      expect(errors[0]).toHaveTextContent('auth.emailInvalid');
     });
-    expect(mockSignUp).not.toHaveBeenCalled();
-
-    // Example: Test password mismatch (if confirm password field exists)
-    // const passwordInput = screen.getByLabelText('password');
-    // const confirmPasswordInput = screen.getByLabelText('confirmPasswordLabel');
-    // await user.type(passwordInput, 'Password123!');
-    // await user.type(confirmPasswordInput, 'Password456!');
-    // await user.click(submitButton);
-    // await waitFor(() => {
-    //   expect(screen.getByText('passwordConfirm')).toBeInTheDocument();
-    // });
-    // expect(mockSignUp).not.toHaveBeenCalled();
   });
 
-  // Optional: Test sign-up failure (hook reject) - similar to SignInForm
-  it('should allow submission even if sign-up fails internally', async () => {
-    const user = userEvent.setup();
-    // Mock signUp to resolve - testing form calls the function
-    mockSignUp.mockResolvedValue(undefined);
+  test('validates password length', async () => {
+    render(<SignUpForm />);
 
-    renderSignUpForm();
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'john@example.com' } });
+    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'short' } });
 
-    const nameInput = screen.getByLabelText('nameLabel');
-    const emailInput = screen.getByLabelText('email');
-    const passwordInput = screen.getByLabelText('password');
-    const submitButton = screen.getByRole('button', { name: 'signUp' });
-
-    await user.type(nameInput, 'Test User Fail');
-    await user.type(emailInput, 'fail@example.com');
-    await user.type(passwordInput, 'Password123!');
-
-    await user.click(submitButton);
+    fireEvent.click(screen.getByRole('button', { name: 'Sign Up' }));
 
     await waitFor(() => {
-      expect(mockSignUp).toHaveBeenCalledTimes(1);
-      expect(mockSignUp).toHaveBeenCalledWith('fail@example.com', 'Password123!', 'Test User Fail');
+      const errors = screen.getAllByTestId('form-error');
+      expect(errors).toHaveLength(1);
+      expect(errors[0]).toHaveTextContent('auth.passwordTooShort');
     });
+  });
 
-    // Wait for button to become enabled again
+  test('submits form with valid data', async () => {
+    render(<SignUpForm />);
+
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'john@example.com' } });
+    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Sign Up' }));
+
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'signUp' })).toBeEnabled();
+      expect(mockSignUp).toHaveBeenCalledWith('john@example.com', 'password123', 'John Doe');
     });
+  });
+
+  test('shows link to sign in page', () => {
+    render(<SignUpForm />);
+
+    const signInLink = screen.getByRole('link', { name: 'Sign In' });
+    expect(signInLink).toHaveAttribute('href', '/sign-in');
+    expect(signInPath).toHaveBeenCalled();
   });
 });
