@@ -25,7 +25,9 @@ export const variablesPath = () => '/variables';
 export const historyPath = () => '/history';
 export const nonFoundPath = () => '/404';
 export const isAuthenticatedPath = (pathname: string) => {
-  return authenticatedPathesPrefix().some((prefix) => pathname.startsWith(prefix));
+  const upperPathname = pathname.toUpperCase();
+  // Check if the uppercase pathname contains any of the uppercase authenticated prefixes
+  return authenticatedPathesPrefix().some((prefix) => upperPathname.includes(prefix));
 };
 
 function pathWithEmail(path: string, email?: string) {
