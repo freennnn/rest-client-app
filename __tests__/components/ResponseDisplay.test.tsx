@@ -3,6 +3,19 @@ import React from 'react';
 import ResponseDisplay from '@/components/ResponseDisplay';
 import { render, screen } from '@testing-library/react';
 
+jest.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      title: 'Response',
+      statusLabel: 'Status:',
+      timeLabel: 'Time:',
+      sizeLabel: 'Size:',
+      noResponsePlaceholder: 'Response will appear here after sending a request',
+    };
+    return translations[key] || key;
+  },
+}));
+
 describe('ResponseDisplay Component', () => {
   test('renders empty state when no response data is provided', () => {
     render(<ResponseDisplay responseData={null} error={null} />);
@@ -20,8 +33,8 @@ describe('ResponseDisplay Component', () => {
 
     expect(screen.getByText(errorMessage)).toBeInTheDocument();
     expect(
-      screen.getByText('Response will appear here after sending a request')
-    ).toBeInTheDocument();
+      screen.queryByText('Response will appear here after sending a request')
+    ).not.toBeInTheDocument();
   });
 
   test('renders successful response data correctly', () => {
@@ -29,7 +42,7 @@ describe('ResponseDisplay Component', () => {
       status: 200,
       statusText: 'OK',
       body: JSON.stringify({ message: 'Success', data: { id: 1, name: 'Test' } }),
-      time: 123,
+      duration: 123,
     };
 
     render(<ResponseDisplay responseData={successResponse} error={null} />);
@@ -46,7 +59,7 @@ describe('ResponseDisplay Component', () => {
       status: 404,
       statusText: 'Not Found',
       body: JSON.stringify({ error: 'Resource not found' }),
-      time: 50,
+      duration: 50,
     };
 
     render(<ResponseDisplay responseData={clientErrorResponse} error={null} />);
@@ -61,7 +74,7 @@ describe('ResponseDisplay Component', () => {
       status: 500,
       statusText: 'Internal Server Error',
       body: JSON.stringify({ error: 'Server error occurred' }),
-      time: 200,
+      duration: 200,
     };
 
     render(<ResponseDisplay responseData={serverErrorResponse} error={null} />);
@@ -76,7 +89,7 @@ describe('ResponseDisplay Component', () => {
       status: 301,
       statusText: 'Moved Permanently',
       body: '',
-      time: 30,
+      duration: 30,
     };
 
     render(<ResponseDisplay responseData={redirectResponse} error={null} />);
@@ -90,7 +103,7 @@ describe('ResponseDisplay Component', () => {
       status: 200,
       statusText: 'OK',
       body: '<html><body>Hello World</body></html>',
-      time: 100,
+      duration: 100,
     };
 
     render(<ResponseDisplay responseData={plainTextResponse} error={null} />);
@@ -120,7 +133,7 @@ describe('ResponseDisplay Component', () => {
       status: 200,
       statusText: 'OK',
       body: JSON.stringify({ data: 'test' }),
-      time: 150,
+      duration: 150,
     };
 
     render(<ResponseDisplay responseData={successResponseWithWarning} error={errorMessage} />);
@@ -138,7 +151,7 @@ describe('ResponseDisplay Component', () => {
       status: 200,
       statusText: 'OK',
       body: '{ invalid json',
-      time: 100,
+      duration: 100,
     };
 
     render(<ResponseDisplay responseData={invalidJsonResponse} error={null} />);

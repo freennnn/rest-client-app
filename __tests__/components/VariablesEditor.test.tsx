@@ -10,6 +10,31 @@ jest.mock('@/utils/variables/variableStorage', () => ({
   saveVariables: jest.fn(),
 }));
 
+jest.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      statusSaving: 'Saving changes...',
+      statusSaved: 'Changes saved successfully',
+      statusError: 'Error saving changes',
+      yourVariablesTitle: 'Your Variables',
+      noVariablesPlaceholder: 'No variables defined yet. Create one below.',
+      deleteButton: 'Delete',
+      addNewTitle: 'Add New Variable',
+      nameLabel: 'Variable Name',
+      namePlaceholder: 'API_KEY',
+      valueLabel: 'Value',
+      valuePlaceholder: 'your-api-key-value',
+      addButton: 'Add Variable',
+      usageTitle: 'How to Use Variables',
+      usageIntro: 'Variables can be used in:',
+      usageUrl: 'URLs:',
+      usageHeaders: 'Headers:',
+      usageBody: 'Request Body:',
+    };
+    return translations[key] || key;
+  },
+}));
+
 describe('VariablesEditor Component', () => {
   const mockVariables: Variable[] = [
     { id: 'var-1', name: 'API_KEY', value: 'abc123' },
@@ -108,7 +133,7 @@ describe('VariablesEditor Component', () => {
     const apiKeyInput = inputs.find((input) => input.getAttribute('value') === 'abc123');
     expect(apiKeyInput).toBeDefined();
 
-    fireEvent.change(apiKeyInput!, { target: { value: 'updated-key' } });
+    fireEvent.change(apiKeyInput!, { target: { value: 'new-value' } });
 
     act(() => {
       jest.advanceTimersByTime(500);
@@ -117,7 +142,7 @@ describe('VariablesEditor Component', () => {
     expect(saveVariables).toHaveBeenCalled();
     const savedVariables = (saveVariables as jest.Mock).mock.calls[0][0];
     expect(savedVariables).toHaveLength(2);
-    expect(savedVariables[0].value).toBe('updated-key');
+    expect(savedVariables[0].value).toBe('new-value');
   });
 
   test('displays saving status and then saved status', async () => {

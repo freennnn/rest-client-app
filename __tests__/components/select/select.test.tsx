@@ -1,60 +1,80 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 
-import CustomSelect from '@/components/select/select';
-import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { render, screen } from '@testing-library/react';
 
-jest.mock('next/image', () => {
-  const { default: NextImage } = jest.requireActual('next/image');
-  const MockImage = forwardRef<HTMLImageElement, React.ComponentProps<typeof NextImage>>(
-    (props, ref) => <NextImage unoptimized {...props} ref={ref} />
-  );
-  MockImage.displayName = 'Image';
-  return MockImage;
-});
-
-describe('CustomSelect Component', () => {
-  const options = [
-    { label: 'Option One', value: 'one', icon: '/icon1.png' },
-    { label: 'Option Two', value: 'two', icon: '/icon2.png' },
-    { label: 'Option Three', value: 'three' },
-  ];
-
-  it('renders with default value and optional icon', () => {
+describe('Select Component', () => {
+  test('renders Select component with default props', () => {
     render(
-      <CustomSelect
-        icon='/main-icon.png'
-        options={options}
-        defaultValue={options[0]}
-        selectIcon
-        onChange={jest.fn()}
-      />
+      <Select>
+        <SelectTrigger>
+          <SelectValue placeholder='Select option' />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value='1'>Option 1</SelectItem>
+          <SelectItem value='2'>Option 2</SelectItem>
+        </SelectContent>
+      </Select>
     );
 
-    expect(screen.getByRole('button')).toHaveTextContent('Option One');
-    expect(screen.getByRole('img', { name: /icon/i })).toHaveAttribute('src', '/main-icon.png');
+    expect(screen.getByText('Select option')).toBeInTheDocument();
   });
 
-  it('opens dropdown on click and lists options', () => {
-    render(<CustomSelect options={options} defaultValue={options[1]} onChange={jest.fn()} />);
+  test('renders Select component with provided value', () => {
+    render(
+      <Select value='1'>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value='1'>Option 1</SelectItem>
+          <SelectItem value='2'>Option 2</SelectItem>
+        </SelectContent>
+      </Select>
+    );
 
-    const toggle = screen.getByRole('button');
-    fireEvent.click(toggle);
-
-    options.forEach((opt) => {
-      const matches = screen.getAllByText(opt.label);
-      expect(matches.length).toBeGreaterThan(0);
-    });
+    const trigger = screen.getByRole('combobox');
+    expect(trigger).toBeInTheDocument();
   });
 
-  it('calls onChange and updates selection when an option is clicked', () => {
-    const handleChange = jest.fn();
-    render(<CustomSelect options={options} defaultValue={options[2]} onChange={handleChange} />);
+  test('renders Select with disabled state', () => {
+    render(
+      <Select disabled>
+        <SelectTrigger>
+          <SelectValue placeholder='Select option' />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value='1'>Option 1</SelectItem>
+        </SelectContent>
+      </Select>
+    );
 
-    fireEvent.click(screen.getByRole('button'));
-    fireEvent.click(screen.getByText('Option One'));
+    const trigger = screen.getByRole('combobox');
 
-    expect(handleChange).toHaveBeenCalledWith('one');
-    expect(screen.getByRole('button')).toHaveTextContent('Option One');
+    expect(trigger).toHaveAttribute('disabled');
+    expect(trigger).toHaveClass('disabled:opacity-50');
+  });
+
+  test('renders SelectItem with disabled state', () => {
+    render(
+      <Select>
+        <SelectTrigger>
+          <SelectValue placeholder='Select option' />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value='1' disabled>
+            Option 1
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    );
+
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
   });
 });

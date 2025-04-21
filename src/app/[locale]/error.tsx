@@ -13,7 +13,8 @@ export default function ErrorComponent({ error }: { error: Error & { digest?: st
     <div className='flex flex-col items-center justify-center flex-1 px-4 py-12 text-center'>
       <h2 className='text-2xl font-semibold text-destructive'>{t('title')}</h2>
       <p className='mt-4 text-muted-foreground'>
-        {t('description')} {error.message ? `(${error.message})` : ''}
+        {t('description')}
+        {error.message ? ` (${error.message})` : ''}
       </p>
       <Button onClick={() => router.push(homePath())} className='mt-6'>
         {t('backToHome')}
