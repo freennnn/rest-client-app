@@ -16,8 +16,6 @@ const config: Config = {
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/', 
     '<rootDir>/.next/',
-    '<rootDir>/__tests__/app/\\[locale\\]/404/page.test.tsx',
-    '<rootDir>/__tests__/components/HistoryViewer.test.tsx'
   ],
 
   moduleNameMapper: {
@@ -34,12 +32,10 @@ const config: Config = {
     '!src/**/*.d.ts',
     '!src/**/index.ts',
     '!src/@types/**',
-    '!src/utils/supabase/**',
-    '!src/i18n/**',
-    '!src/utils/middleware/**', 
-    '!src/middleware.ts',
-    // Exclude HistoryViewer from coverage reporting
-    '!src/components/HistoryViewer.tsx',
+    '!src/utils/supabase/**', // Supabase third party code
+    '!src/i18n/**', // next-intl third party code
+    '!src/utils/middleware/**', // middleware Next.js code
+    '!src/middleware.ts', // middleware Next.js code
   ],
 };
 
